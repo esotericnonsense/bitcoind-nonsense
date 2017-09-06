@@ -1,0 +1,20 @@
+/*
+* { padding: 0; margin: 0; font-family: monospace; }
+*/
+* { font-family: monospace; }
+p { margin: 0; }
+
+div#app { margin: 0 auto; width: 90vw; }
+
+div#header { border-radius: 2vw; }
+div#header.connected { background-color: #bbffbb; }
+div#header.disconnected { background-color: red; }
+div#header h1 { text-align: center; padding: 2vw; }
+
+div.section { width: 88%; margin: 0 auto; }
+div.section h2 { padding: 0.2vw 0; border-bottom: 2px dashed lightgray; }
+
+table { width: 100%; }
+th, td { text-align: center; }
+th { border: 1px dotted black; }
+td { border: 1px dotted lightgray; }

@@ -1,0 +1,112 @@
+<!doctype html>
+
+<head>
+    <meta charset="utf-8">
+    <title>bitcoind-nonsense</title>
+    <link rel="stylesheet" href="index.css">
+    <script src="vue.js"></script>
+    <script src="socket.io.js"></script>
+    <script src="index.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div id="header"
+            :class="connected ? 'connected' : 'disconnected'"
+        >
+            <h1>
+                bitcoind-nonsense
+                {{ connected ? '' : '(disconnected)' }}
+            </h1>
+        </div>
+
+        <!--
+        <div class="section" v-if="chaininfo">
+            <h2>chaininfo</h2> 
+            <p>
+                Chain: {{ chaininfo.chain }}
+            <p>
+            <p>
+                Blocks: {{ chaininfo.blocks }}/{{ chaininfo.headers }}
+            </p>
+            <p>
+                Best: {{ chaininfo.bestblockhash }}
+            </p>
+        </div>
+        -->
+
+        <!--
+        <div class="section" v-if="mempoolinfo">
+            <h2>mempool/info</h2>
+            <p>
+                Transactions: {{ mempoolinfo.size }}
+            </p>
+            <p>
+                Size: {{ mempoolinfo.bytes }} bytes
+            </p>
+        </div>
+        -->
+
+        <div class="section" v-if="mempoolbins">
+            <h2>mempool/bins [ {{ dots }} ]</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="border: none;"></th>
+                        <th colspan=3>this bin</th>
+                        <th colspan=3>cumulative</th>
+                    </tr>
+                    <tr>
+                        <th>limits / sat/b</th>
+                        <th>tx</th>
+                        <th>size / b</th>
+                        <th>amt / btc</th>
+                        <th>tx</th>
+                        <th>size / b</th>
+                        <th>amt / btc</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="bin in mempoolbins">
+                        <td>{{ bin[0] }} - {{ (bin[1] < 21*(10**14)) ? bin[1] : 'max' }}</td>
+                        <td>{{ bin[2] }}</td>
+                        <td>{{ bin[3] }}</td>
+                        <td>{{ (bin[4]/(10**8)).toFixed(3) }}</td>
+                        <td>{{ bin[5] }}</td>
+                        <td>{{ bin[6] }}</td>
+                        <td>{{ (bin[7]/(10**8)).toFixed(3) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" v-if="blocks">
+            <h2>blocks</h2>
+            <table>
+                <thead>
+                    <th>age</th>
+                    <th>height</th>
+                    <th>hash</th>
+                    <th>size</th>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for="block in sortedBlocks"
+                    >
+                        <td>{{ (now - block.time) | timeInterval }}</td>
+                        <td>{{ block.height }}</td>
+                        <td>{{ block.hash }}</td>
+                        <td>{{ block.size }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" v-if="messages.length > 0">
+            <h2>messages</h2>
+            <p v-for="message in messages">
+                {{ message }}
+            </p>
+        </div>
+    </div>
+</body>
