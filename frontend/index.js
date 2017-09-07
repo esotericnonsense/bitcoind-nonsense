@@ -22,6 +22,9 @@ var CHARTIST_OPTIONS = {
             return moment(value).format('hh:mm:ss');
         }
     },
+    axisY: {
+        low: 0,
+    },
     plugins: [
         Chartist.plugins.tooltip({
             anchorToPoint: true,
