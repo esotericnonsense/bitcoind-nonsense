@@ -35,7 +35,7 @@ function binMempoolContents(mempoolcontents) {
     for (let txid of Object.keys(mempoolcontents)) {
         let tx = mempoolcontents[txid];
 
-        if (tx.size*4 !== tx.weight) {
+        if (tx.wtxid !== txid) {
             segwit_count += 1;
         }
 
