@@ -16,8 +16,10 @@ var CHARTIST_OPTIONS = {
         left: 20,
     },
     axisX: {
+        type: Chartist.FixedScaleAxis,
+        divisor: 5,
         labelInterpolationFnc: function(value, index) {
-            return index % 10 ? null : value;
+            return moment(value).format('hh:mm:ss');
         }
     },
     plugins: [
@@ -152,13 +154,7 @@ onload = function() {
     socket.on("mempool/bins", function(mempoolbins) {
         let truncate = 120; // 120*15 = 1800s, half an hour.
 
-        let nowstr = (new Date()).toTimeString().slice(0, 8);
-        CHARTIST_DATA.labels.push(nowstr);
-
-        let l = CHARTIST_DATA.labels.length - truncate;
-        if (l > 0) {
-            CHARTIST_DATA.labels = CHARTIST_DATA.labels.slice(l);
-        };
+        let now = new Date();
 
         app.mempoolbins = mempoolbins;
         let i = 0;
@@ -171,10 +167,11 @@ onload = function() {
             }
 
             CHARTIST_DATA.series[i].data.push({
-                meta: `${mempoolbins[i][0]}+ sat/b (${nowstr})`,
-                value: n,
+                x: now,
+                y: n,
             });
 
+            let l = CHARTIST_DATA.series[i].data.length - truncate;
             if (l > 0) {
                 CHARTIST_DATA.series[i].data = CHARTIST_DATA.series[i].data.slice(l);
             };
