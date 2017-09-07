@@ -117,6 +117,9 @@ onload = function() {
 
     setInterval(function() {
         app.now = getCurrentTime();
+        if (!app.connected) {
+            return;
+        }
         socket.emit("request", app.request_count, "chaininfo");
         app.request_count++;
         app.dots += "•"
@@ -189,6 +192,7 @@ onload = function() {
 
     socket.on("disconnect", function () {
         app.connected = false;
+        app.dots = "";
         app.messages = [];
     });
 }
