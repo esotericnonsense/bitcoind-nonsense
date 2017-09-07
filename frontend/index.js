@@ -2,9 +2,12 @@ const socket = io("http://localhost:3000");
 
 const ALL_BITCOINS = 21*(10**14);
 
+var CHARTIST_DATA = {
+    labels: [],
+    series: [],
+};
 var CHART = null;
 var CHARTIST_OPTIONS = {
-    lineSmooth: true,
     chartPadding: {
         top: 0,
         right: 0,
@@ -12,6 +15,8 @@ var CHARTIST_OPTIONS = {
         left: 20,
     },
     plugins: [
+        Chartist.plugins.tooltip(),
+        /*
         Chartist.plugins.ctAxisTitle({
             axisX: {
                 axisTitle: 'fee / sat/b',
@@ -31,7 +36,8 @@ var CHARTIST_OPTIONS = {
                 },
                 flipTitle: false
             },
-        })
+        }),
+        */
     ],
 }
 
@@ -57,7 +63,7 @@ onload = function() {
             // mempoolinfo: null,
             mempoolbins: null,
             blocks: {},
-            selectedblock: null,
+            // selectedblock: null,
             messages: [],
             request_count: 0
         },
@@ -102,11 +108,12 @@ onload = function() {
                 socket.emit("request", app.request_count, "block/notxdetails", hash);
                 app.request_count++;
             },
+            /*
             selectBlock: function(hash) {
-                console.log("yo!");
                 console.log(hash);
                 app.selectedblock = hash;
             },
+            */
         },
     })
 
@@ -137,15 +144,43 @@ onload = function() {
     });
 
     socket.on("mempool/bins", function(mempoolbins) {
+        let truncate = 120; // 120*15 = 1800s, half an hour.
+
+        let nowstr = (new Date()).toTimeString().slice(0, 8);
+        CHARTIST_DATA.labels.push(nowstr);
+        if (CHARTIST_DATA.labels.length > truncate) {
+            CHARTIST_DATA.labels = CHARTIST_DATA.labels.slice(truncate);
+        };
         app.mempoolbins = mempoolbins;
-        let data = {
-            labels: mempoolbins.map(x => x[0]),
-            series: [mempoolbins.map(x => x[6])],
+        /*
+        if (CHARTIST_DATA.labels === []) {
+            CHARTIST_DATA.labels = mempoolbins.map(x => x[0]);
+        }
+        */
+        let i = 0;
+        for (let n of mempoolbins.map(x => x[6])) {
+            if (CHARTIST_DATA.series.length <= i) {
+                CHARTIST_DATA.series.push({
+                    name: `${n}+ sat/b`,
+                    data: [],
+                });
+            }
+
+            CHARTIST_DATA.series[i].data.push({
+                meta: `${mempoolbins[i][0]}+ sat/b (${nowstr})`,
+                value: n,
+            });
+
+            if (CHARTIST_DATA.series[i].data.length > truncate) {
+                CHARTIST_DATA.series[i].data = CHARTIST_DATA.series[i].data.slice(truncate);
+            };
+
+            i++;
         };
         if (!CHART) {
-            CHART = new Chartist.Line('.ct-chart', data, CHARTIST_OPTIONS);
+            CHART = new Chartist.Line('.ct-chart', CHARTIST_DATA, CHARTIST_OPTIONS);
         } else {
-            CHART.update(data);
+            CHART.update(CHARTIST_DATA);
         }
     });
 

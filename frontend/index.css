@@ -20,3 +20,6 @@ table { width: 100%; }
 th, td { text-align: center; }
 th { border: 1px dotted black; }
 td { border: 1px dotted lightgray; }
+
+.ct-line { stroke-width: 2px !important; }
+.ct-point { stroke-width: 4px !important; }
