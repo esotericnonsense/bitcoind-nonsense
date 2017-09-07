@@ -7,14 +7,14 @@ function binIt(n) {
     let x = n + 0.00001; // ceil integers to next bin
     return (x < 5) ?
         Math.ceil(x) :
-        (x < 50) ?
+        (x < 30) ?
             Math.ceil(x / 5) * 5 :
-            (x < 100) ?
-                Math.ceil(x / 10) * 10 :
-                (x < 200) ?
-                    Math.ceil(x / 25) * 25 :
-                    (x < 750) ?
-                        Math.ceil(x / 50) * 50 :
+            (x < 60) ?
+                Math.ceil(x / 30) * 30 :
+                (x < 300) ?
+                    Math.ceil(x / 50) * 50 :
+                    (x < 500) ?
+                        Math.ceil(x / 100) * 100 :
                         MAX_BITCOINS;
 }
 

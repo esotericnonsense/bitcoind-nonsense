@@ -14,9 +14,15 @@ var CHARTIST_OPTIONS = {
         bottom: 20,
         left: 20,
     },
+    axisX: {
+        labelInterpolationFnc: function(value, index) {
+            return index % 10 ? null : value;
+        }
+    },
     plugins: [
-        Chartist.plugins.tooltip(),
-        /*
+        Chartist.plugins.tooltip({
+            anchorToPoint: true,
+        }),
         Chartist.plugins.ctAxisTitle({
             axisX: {
                 axisTitle: 'fee / sat/b',
@@ -37,7 +43,6 @@ var CHARTIST_OPTIONS = {
                 flipTitle: false
             },
         }),
-        */
     ],
 }
 
@@ -161,7 +166,7 @@ onload = function() {
         for (let n of mempoolbins.map(x => x[6])) {
             if (CHARTIST_DATA.series.length <= i) {
                 CHARTIST_DATA.series.push({
-                    name: `${n}+ sat/b`,
+                    name: `${mempoolbins[i][0]}+ sat/b`,
                     data: [],
                 });
             }
