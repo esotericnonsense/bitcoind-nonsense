@@ -15,7 +15,9 @@ function binIt(n) {
                     Math.ceil(x / 50) * 50 :
                     (x < 500) ?
                         Math.ceil(x / 100) * 100 :
-                        MAX_BITCOINS;
+                        (x < 1500) ?
+                            Math.ceil(x / 500) * 500 :
+                            MAX_BITCOINS;
 }
 
 var BINS = {};

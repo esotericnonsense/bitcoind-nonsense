@@ -153,15 +153,13 @@ onload = function() {
 
         let nowstr = (new Date()).toTimeString().slice(0, 8);
         CHARTIST_DATA.labels.push(nowstr);
-        if (CHARTIST_DATA.labels.length > truncate) {
-            CHARTIST_DATA.labels = CHARTIST_DATA.labels.slice(truncate);
+
+        let l = CHARTIST_DATA.labels.length - truncate;
+        if (l > 0) {
+            CHARTIST_DATA.labels = CHARTIST_DATA.labels.slice(l);
         };
+
         app.mempoolbins = mempoolbins;
-        /*
-        if (CHARTIST_DATA.labels === []) {
-            CHARTIST_DATA.labels = mempoolbins.map(x => x[0]);
-        }
-        */
         let i = 0;
         for (let n of mempoolbins.map(x => x[6])) {
             if (CHARTIST_DATA.series.length <= i) {
@@ -176,8 +174,8 @@ onload = function() {
                 value: n,
             });
 
-            if (CHARTIST_DATA.series[i].data.length > truncate) {
-                CHARTIST_DATA.series[i].data = CHARTIST_DATA.series[i].data.slice(truncate);
+            if (l > 0) {
+                CHARTIST_DATA.series[i].data = CHARTIST_DATA.series[i].data.slice(l);
             };
 
             i++;
