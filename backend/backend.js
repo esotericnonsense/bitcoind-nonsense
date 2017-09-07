@@ -137,25 +137,13 @@ io.on('connection', function (socket) {
                 break;
             case "getheaders":
                 break;
-            */
             case "mempool/contents":
-            case "mempool/info":
-                // console.log(`req${n}: ${request}(${params}): requesting from bitcoind`);
-                // sanity check
-                if ((request !== "mempool/contents") & (request !== "mempool/info")) {
-                    break;
-                }
-                fetch(`http://127.0.0.1:8332/rest/${request}/.json`)
-                    .then(function(res) {
-                        return res.json();
-                    }).then(function(json) {
-                        console.log(`req${n}: ${request}(${params}): sending response`);
-                        socket.emit(request, json);
-                    });
                 break;
+            case "mempool/info":
+                break;
+            */
             case "mempool/bins":
-                // console.log(`req${n}: ${request}(${params}): requesting from bitcoind`);
-                // sanity check
+                console.log(`req${n}: ${request}(${params}): requesting from bitcoind`);
                 fetch(`http://127.0.0.1:8332/rest/mempool/contents/.json`)
                     .then(function(res) {
                         return res.json();

@@ -171,12 +171,6 @@ onload = function() {
         }
     });
 
-    /*
-    socket.on("mempool/info", function(mempoolinfo) {
-        app.mempoolinfo = mempoolinfo;
-    });
-    */
-
     socket.on("block/notxdetails", function(block) {
         // console.log(`got block ${block.hash}`);
         Vue.set(app.blocks, block.hash, block);
@@ -189,10 +183,6 @@ onload = function() {
         app.connected = true;
         socket.emit("request", app.request_count, "chaininfo");
         app.request_count++;
-        /*
-        socket.emit("request", app.request_count, "mempool/info");
-        app.request_count++;
-        */
         socket.emit("request", app.request_count, "mempool/bins");
         app.request_count++;
     });
