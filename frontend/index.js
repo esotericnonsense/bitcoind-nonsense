@@ -2,6 +2,39 @@ const socket = io("http://localhost:3000");
 
 const ALL_BITCOINS = 21*(10**14);
 
+var CHART = null;
+var CHARTIST_OPTIONS = {
+    lineSmooth: true,
+    chartPadding: {
+        top: 0,
+        right: 0,
+        bottom: 20,
+        left: 20,
+    },
+    plugins: [
+        Chartist.plugins.ctAxisTitle({
+            axisX: {
+                axisTitle: 'fee / sat/b',
+                axisClass: 'ct-axis-title',
+                offset: {
+                    x: 0,
+                    y: 35
+                },
+                textAnchor: 'middle'
+            },
+            axisY: {
+                axisTitle: 'cumulative size / b',
+                axisClass: 'ct-axis-title',
+                offset: {
+                    x: 0,
+                    y: -10
+                },
+                flipTitle: false
+            },
+        })
+    ],
+}
+
 var getCurrentTime = function() {
     return ((new Date()).getTime() / 1000);
 };
@@ -105,6 +138,15 @@ onload = function() {
 
     socket.on("mempool/bins", function(mempoolbins) {
         app.mempoolbins = mempoolbins;
+        let data = {
+            labels: mempoolbins.map(x => x[0]),
+            series: [mempoolbins.map(x => x[6])],
+        };
+        if (!CHART) {
+            CHART = new Chartist.Line('.ct-chart', data, CHARTIST_OPTIONS);
+        } else {
+            CHART.update(data);
+        }
     });
 
     /*
@@ -116,7 +158,7 @@ onload = function() {
     socket.on("block/notxdetails", function(block) {
         // console.log(`got block ${block.hash}`);
         Vue.set(app.blocks, block.hash, block);
-        if (Object.keys(app.blocks).length < 6) {
+        if (Object.keys(app.blocks).length < 3) {
             app.getBlockIfRequired(block.previousblockhash);
         }
     });

@@ -14,6 +14,8 @@ div#header h1 { text-align: center; padding: 2vw; }
 div.section { width: 88%; margin: 0 auto; }
 div.section h2 { padding: 0.2vw 0; border-bottom: 2px dashed lightgray; }
 
+div#mempoolchart { width: 80%; margin: 0 auto; }
+
 table { width: 100%; }
 th, td { text-align: center; }
 th { border: 1px dotted black; }

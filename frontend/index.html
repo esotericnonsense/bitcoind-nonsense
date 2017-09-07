@@ -4,7 +4,10 @@
     <meta charset="utf-8">
     <title>bitcoind-nonsense</title>
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="chartist.min.css">
     <script src="vue.js"></script>
+    <script src="chartist.min.js"></script>
+    <script src="chartist-plugin-axistitle.js"></script>
     <script src="socket.io.js"></script>
     <script src="index.js"></script>
 </head>
@@ -46,6 +49,9 @@
             </p>
         </div>
         -->
+        <div id="mempoolchart">
+            <div class="ct-chart ct-golden-section"></div>
+        </div>
 
         <div class="section" v-if="mempoolbins">
             <h2>mempool/bins [ {{ dots }} ]</h2>
