@@ -15,7 +15,7 @@ function binIt(n) {
                     Math.ceil(x / 50) * 50 :
                     (x < 500) ?
                         Math.ceil(x / 100) * 100 :
-                        (x < 1500) ?
+                        (x < 1000) ?
                             Math.ceil(x / 500) * 500 :
                             MAX_BITCOINS;
 }
@@ -76,7 +76,7 @@ function binMempoolContents(mempoolcontents) {
     if (segwit_count) {
         console.log(`${segwit_count}/${Object.keys(mempoolcontents).length} segwit transactions in mempool`);
     }
-    return binned;
+    return binned.reverse();
 }
 
 io.on('connection', function (socket) {

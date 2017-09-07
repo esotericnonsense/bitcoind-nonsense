@@ -8,6 +8,7 @@ var CHARTIST_DATA = {
 };
 var CHART = null;
 var CHARTIST_OPTIONS = {
+    /* showArea: true, */
     chartPadding: {
         top: 0,
         right: 0,
