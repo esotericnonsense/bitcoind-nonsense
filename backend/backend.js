@@ -33,12 +33,12 @@ function binMempoolContents(mempoolcontents) {
     for (let bin of BINS) {
         bins[bin] = [];
     }
-    let segwit_count = 0;
+    let size_segwit = 0;
     for (let txid of Object.keys(mempoolcontents)) {
         let tx = mempoolcontents[txid];
 
         if (tx.wtxid !== txid) {
-            segwit_count += 1;
+            size_segwit += 1;
         }
 
         let sat_b = Math.round(tx.fee*(10**8)/tx.size);
@@ -50,33 +50,36 @@ function binMempoolContents(mempoolcontents) {
     let binned = [];
     let prevbin = 1;
 
-    let cum_count = 0;
     let cum_size = 0;
+    let cum_bytes = 0;
     let cum_fees = 0;
     for (let bin of Object.keys(bins)) {
         let intbin = parseInt(bin);
         let transactions = bins[bin];
 
-        let count = transactions.length;
-        cum_count += count;
+        let total_size = transactions.length;
+        cum_size += total_size;
 
-        let total_size = transactions.reduce(
+        let total_bytes = transactions.reduce(
             (sum, tx) => (sum + tx[0])
         , 0);
-        cum_size += total_size;
+        cum_bytes += total_bytes;
 
         let total_fees = transactions.reduce(
             (sum, tx) => (sum + tx[1])
         , 0);
         cum_fees += total_fees;
 
-        binned.push([prevbin, intbin, count, total_size, total_fees, cum_count, cum_size, cum_fees]);
+        binned.push([prevbin, intbin, total_size, total_bytes, total_fees, cum_size, cum_bytes, cum_fees]);
         prevbin = intbin;
     }
-    if (segwit_count) {
-        console.log(`${segwit_count}/${Object.keys(mempoolcontents).length} segwit transactions in mempool`);
-    }
-    return binned.reverse();
+    return {
+        size: cum_size,
+        size_segwit: size_segwit,
+        bytes: cum_bytes,
+        fees: cum_fees,
+        bins: binned.reverse()
+    };
 }
 
 io.on('connection', function (socket) {

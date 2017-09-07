@@ -65,13 +65,10 @@ onload = function() {
         data: {
             connected: false,
             now: getCurrentTime(),
-            utcnow: getCurrentTimeUTC(),
             dots: "",
             chaininfo: null,
-            // mempoolinfo: null,
             mempoolbins: null,
             blocks: {},
-            // selectedblock: null,
             messages: [],
             request_count: 0
         },
@@ -112,22 +109,16 @@ onload = function() {
                 if (hash in app.blocks) {
                     return;
                 }
-                // console.log(`requesting ${hash}`);
                 socket.emit("request", app.request_count, "block/notxdetails", hash);
                 app.request_count++;
             },
-            /*
-            selectBlock: function(hash) {
-                console.log(hash);
-                app.selectedblock = hash;
-            },
-            */
         },
     })
 
     setInterval(function() {
         app.now = getCurrentTime();
-        app.utcnow = getCurrentTimeUTC();
+        socket.emit("request", app.request_count, "chaininfo");
+        app.request_count++;
         app.dots += "•"
     }, 1000);
 
@@ -135,16 +126,9 @@ onload = function() {
         if (!app.connected) {
             return;
         }
-        socket.emit("request", app.request_count, "chaininfo");
-        app.request_count++;
-        /*
-        socket.emit("request", app.request_count, "mempool/info");
-        app.request_count++;
-        */
         socket.emit("request", app.request_count, "mempool/bins");
         app.request_count++;
-        app.dots = "";
-    }, 5000);
+    }, 15000);
 
     socket.on("chaininfo", function(chaininfo) {
         app.chaininfo = chaininfo;
@@ -152,16 +136,18 @@ onload = function() {
     });
 
     socket.on("mempool/bins", function(mempoolbins) {
+        app.dots = "";
+
         let truncate = 120; // 120*15 = 1800s, half an hour.
 
         let now = new Date();
 
         app.mempoolbins = mempoolbins;
         let i = 0;
-        for (let n of mempoolbins.map(x => x[6])) {
+        for (let n of mempoolbins.bins.map(x => x[6])) {
             if (CHARTIST_DATA.series.length <= i) {
                 CHARTIST_DATA.series.push({
-                    name: `${mempoolbins[i][0]}+ sat/b`,
+                    name: `${mempoolbins.bins[i][0]}+ sat/b`,
                     data: [],
                 });
             }

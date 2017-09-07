@@ -41,23 +41,25 @@
         </div>
         -->
 
-        <!--
-        <div class="section" v-if="mempoolinfo">
-            <h2>mempool/info</h2>
-            <p>
-                Transactions: {{ mempoolinfo.size }}
-            </p>
-            <p>
-                Size: {{ mempoolinfo.bytes }} bytes
-            </p>
-        </div>
-        -->
         <div id="mempoolchart">
             <div class="ct-chart ct-golden-section"></div>
         </div>
 
         <div class="section" v-if="mempoolbins">
-            <h2>mempool/bins [ {{ dots }} ]</h2>
+            <h2>mempool info</h2>
+            <p>
+                Transactions: {{ mempoolbins.size }} ({{ mempoolbins.size_segwit }} segwit)
+            </p>
+            <p>
+                Size: {{ mempoolbins.bytes }} bytes
+            </p>
+            <p>
+                Fees: {{ (mempoolbins.fees / 10**5).toFixed(2) }} mBTC
+            </p>
+        </div>
+
+        <div class="section" v-if="mempoolbins">
+            <h2>mempool contents [ {{ dots }} ]</h2>
             <table>
                 <thead>
                     <tr>
@@ -68,22 +70,22 @@
                     <tr>
                         <th>limits / sat/b</th>
                         <th>tx</th>
-                        <th>size / b</th>
-                        <th>amt / btc</th>
+                        <th>size / B</th>
+                        <th>amt / mBTC</th>
                         <th>tx</th>
-                        <th>size / b</th>
-                        <th>amt / btc</th>
+                        <th>size / B</th>
+                        <th>amt / mBTC</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="bin in mempoolbins">
+                    <tr v-for="bin in mempoolbins.bins">
                         <td>{{ bin[0] }} - {{ (bin[1] < 21*(10**14)) ? bin[1] : 'max' }}</td>
                         <td>{{ bin[2] }}</td>
                         <td>{{ bin[3] }}</td>
-                        <td>{{ (bin[4]/(10**8)).toFixed(3) }}</td>
+                        <td>{{ (bin[4]/(10**5)).toFixed(2) }}</td>
                         <td>{{ bin[5] }}</td>
                         <td>{{ bin[6] }}</td>
-                        <td>{{ (bin[7]/(10**8)).toFixed(3) }}</td>
+                        <td>{{ (bin[7]/(10**5)).toFixed(2) }}</td>
                     </tr>
                 </tbody>
             </table>
