@@ -12,7 +12,7 @@ var CHARTIST_OPTIONS = {
         top: 0,
         right: 0,
         bottom: 20,
-        left: 20,
+        left: 30,
     },
     axisX: {
         type: Chartist.FixedScaleAxis,
