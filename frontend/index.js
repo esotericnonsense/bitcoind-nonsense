@@ -1,5 +1,5 @@
-const socket = io("http://localhost:3000");
-
+// TODO: base API_URL on actual URI in browser
+const API_URL = "http://localhost/api"
 const ALL_BITCOINS = 21*(10**14);
 
 var CHARTIST_DATA = {
@@ -26,9 +26,11 @@ var CHARTIST_OPTIONS = {
         low: 0,
     },
     plugins: [
+        /*
         Chartist.plugins.tooltip({
             anchorToPoint: true,
         }),
+        */
         Chartist.plugins.ctAxisTitle({
             axisX: {
                 axisTitle: 'fee / sat/b',
@@ -52,13 +54,35 @@ var CHARTIST_OPTIONS = {
     ],
 }
 
+var getDateEpoch = function(d) {
+    return (d.getTime() / 1000);
+}
 var getCurrentTime = function() {
-    return ((new Date()).getTime() / 1000);
+    return getDateEpoch(new Date());
 };
 var getCurrentTimeUTC = function() {
     let now = new Date();
     return Math.floor((now.getTime() + now.getTimezoneOffset() * 60000)/1000);
 };
+
+var asyncRequest = function(request, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", `${API_URL}/${request}`, true);
+    xhr.onload = function(e) {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                let j = JSON.parse(xhr.responseText);
+                callback(request, j);
+            } else {
+                // console.error(xhr.statusText);
+            }
+        }
+    };
+    xhr.onerror = function(e) {
+        // console.error(xhr.statusText);
+    };
+    xhr.send(null);
+}
 
 onload = function() {
     el_out = document.getElementById("output");
@@ -68,12 +92,11 @@ onload = function() {
         data: {
             connected: false,
             now: getCurrentTime(),
+            lastpong: new Date(0),
             dots: "",
             chaininfo: null,
             mempoolbins: null,
             blocks: {},
-            messages: [],
-            request_count: 0
         },
         filters: {
             pretty: function(json) {
@@ -112,36 +135,40 @@ onload = function() {
                 if (hash in app.blocks) {
                     return;
                 }
-                socket.emit("request", app.request_count, "block/notxdetails", hash);
-                app.request_count++;
+
+                asyncRequest(`block/notxdetails/${hash}`, processAsyncResponse);
             },
         },
     })
 
     setInterval(function() {
         app.now = getCurrentTime();
-        if (!app.connected) {
-            return;
+        if (((app.now - app.lastpong) > 10) && (app.connected)) {
+            onDisconnect();
         }
-        socket.emit("request", app.request_count, "chaininfo");
-        app.request_count++;
-        app.dots += "•"
+
+        app.dots += "•";
     }, 1000);
+
+    setInterval(function() {
+        asyncRequest(`ping`, processAsyncResponse);
+        asyncRequest(`chaininfo`, processAsyncResponse);
+    }, 5000);
 
     setInterval(function() {
         if (!app.connected) {
             return;
         }
-        socket.emit("request", app.request_count, "mempool/bins");
-        app.request_count++;
+
+        asyncRequest(`mempool/bins`, processAsyncResponse);
     }, 15000);
 
-    socket.on("chaininfo", function(chaininfo) {
+    let dealWithChaininfo = function(chaininfo) {
         app.chaininfo = chaininfo;
         app.getBlockIfRequired(chaininfo.bestblockhash);
-    });
+    };
 
-    socket.on("mempool/bins", function(mempoolbins) {
+    let dealWithMempoolBins = function(mempoolbins) {
         app.dots = "";
 
         let truncate = 120; // 120*15 = 1800s, half an hour.
@@ -175,27 +202,44 @@ onload = function() {
         } else {
             CHART.update(CHARTIST_DATA);
         }
-    });
+    }
 
-    socket.on("block/notxdetails", function(block) {
+    let dealWithBlock = function(block) {
         // console.log(`got block ${block.hash}`);
         Vue.set(app.blocks, block.hash, block);
         if (Object.keys(app.blocks).length < 3) {
             app.getBlockIfRequired(block.previousblockhash);
         }
-    });
+    }
 
-    socket.on("hello", function () {
+    let dealWithPing = function(pong) {
+        if (!app.connected) {
+            onConnect();
+        }
+        app.lastpong = getCurrentTime();
+    }
+
+    let processAsyncResponse = function(request, response) {
+        if (request.startsWith("ping")) {
+            dealWithPing(response);
+        } if (request.startsWith("chaininfo")) {
+            dealWithChaininfo(response);
+        } else if (request.startsWith("block/notxdetails")) {
+            dealWithBlock(response);
+        } else if (request.startsWith("mempool/bins")) {
+            dealWithMempoolBins(response);
+        }
+    }
+
+    let onConnect = function() {
         app.connected = true;
-        socket.emit("request", app.request_count, "chaininfo");
-        app.request_count++;
-        socket.emit("request", app.request_count, "mempool/bins");
-        app.request_count++;
-    });
+        asyncRequest(`chaininfo`, processAsyncResponse);
+        asyncRequest(`mempool/bins`, processAsyncResponse);
+    }
 
-    socket.on("disconnect", function () {
+    let onDisconnect = function() {
         app.connected = false;
-        app.dots = "";
-        app.messages = [];
-    });
+    }
+
+    asyncRequest(`ping`, processAsyncResponse);
 }
