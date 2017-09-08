@@ -8,7 +8,6 @@ var CHARTIST_DATA = {
 };
 var CHART = null;
 var CHARTIST_OPTIONS = {
-    /* showArea: true, */
     chartPadding: {
         top: 0,
         right: 0,
@@ -26,11 +25,6 @@ var CHARTIST_OPTIONS = {
         low: 0,
     },
     plugins: [
-        /*
-        Chartist.plugins.tooltip({
-            anchorToPoint: true,
-        }),
-        */
         Chartist.plugins.ctAxisTitle({
             axisX: {
                 axisTitle: 'fee / sat/b',
