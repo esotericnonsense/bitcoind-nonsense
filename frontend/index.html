@@ -23,21 +23,6 @@
             </h1>
         </div>
 
-        <!--
-        <div class="section" v-if="chaininfo">
-            <h2>chaininfo</h2> 
-            <p>
-                Chain: {{ chaininfo.chain }}
-            <p>
-            <p>
-                Blocks: {{ chaininfo.blocks }}/{{ chaininfo.headers }}
-            </p>
-            <p>
-                Best: {{ chaininfo.bestblockhash }}
-            </p>
-        </div>
-        -->
-
         <div id="mempoolchart">
             <div class="ct-chart ct-golden-section"></div>
         </div>
@@ -45,7 +30,7 @@
         <div class="section" v-if="mempoolbins">
             <h2>mempool info</h2>
             <p>
-                Transactions: {{ mempoolbins.size }} ({{ mempoolbins.size_segwit }} segwit)
+                Transactions: {{ mempoolbins.size }} {{ mempoolbins.size_segwit !== "?" ? `(${mempoolbins.size_segwit} segwit)` : "" }}
             </p>
             <p>
                 Size: {{ mempoolbins.bytes }} bytes
@@ -116,6 +101,18 @@
             </p>
             <p>
                 <a href="bitcoin:3BYFucUnVNhZjUDf6tZweuZ5r9PPjPEcRv">3BYFucUnVNhZjUDf6tZweuZ5r9PPjPEcRv</a> (bitcoin)
+            </p>
+        </div>
+        <div class="section">
+            <h2>notes</h2>
+            <p>
+                all data here is gleaned from the node running at esotericnonsense:8333
+            </p>
+            <p>
+                note that there is no universal mempool, your results may differ
+            </p>
+            <p>
+                mobile viewing is suboptimal - sorry :(
             </p>
         </div>
     </div>

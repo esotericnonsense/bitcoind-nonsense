@@ -4,7 +4,7 @@
 * { font-family: monospace; }
 p { margin: 0; }
 
-div#app { margin: 0 auto; width: 90vw; }
+div#app { margin: 0 auto; min-width: 750px; max-width: 1000px; }
 
 div#header { width: 90%; margin: 0 auto; border-radius: 2vw; }
 div#header.connected { background-color: #bbffbb; }

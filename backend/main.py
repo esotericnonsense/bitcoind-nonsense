@@ -90,14 +90,17 @@ def bin_it(n):
 
 BINS = sorted(list(set(bin_it(n) for n in range(1, 1001))))
 
+from collections import OrderedDict
 def bin_mempool_contents(mempoolcontents):
-    bins = {
-        b: []
+    bins = OrderedDict(
+        (b, [])
         for b in BINS
-    }
+    )
 
     size_segwit = 0
     for txid, tx in mempoolcontents.items():
+        if "wtxid" not in tx:
+            size_segwit = "?"
         if "wtxid" in tx and tx["wtxid"] != txid:
             size_segwit += 1
 
@@ -161,7 +164,7 @@ def mempool_bins():
 
 @app.route("/api/ping")
 def ping():
-    return jsonify("pong")
+    return jsonify({"pong": True})
 
 @app.route("/")
 @app.route("/<path:path>")
