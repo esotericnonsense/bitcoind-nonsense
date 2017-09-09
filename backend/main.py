@@ -190,6 +190,24 @@ def mempool_bins_30m():
 
     return jsonify({"list": l})
 
+@app.route("/api/mempool/bins/range/<int:minutes>")
+def mempool_bins_range(minutes):
+    with sqlite3.connect("database/mempoolbins.db") as conn:
+        c = conn.cursor()
+
+        # Get the last two hours.
+        utc_range_ms = int(unix_time_seconds(
+            datetime.datetime.utcnow() - datetime.timedelta(minutes=minutes)
+        ) * 1000)
+
+        c.execute('''SELECT * FROM (SELECT * FROM mempoolbins WHERE utc_ms > ? ORDER BY random() LIMIT 120) ORDER BY utc_ms''', (utc_range_ms, ))
+        l = [
+            json.loads(r[1])
+            for r in c
+        ]
+
+    return jsonify({"list": l})
+
 @app.route("/api/ping")
 def ping():
     return jsonify({"pong": True})

@@ -1,6 +1,7 @@
 // TODO: base API_URL on actual URI in browser
 const API_URL = "https://esotericnonsense.com/api"
 const ALL_BITCOINS = 21*(10**14);
+const INITIAL_RANGE = 30;
 
 var CHARTIST_DATA = {
     labels: [],
@@ -90,6 +91,7 @@ onload = function() {
             dots: "",
             chaininfo: null,
             mempoolbins: null,
+            range: 0,
             blocks: {},
         },
         filters: {
@@ -132,6 +134,20 @@ onload = function() {
 
                 asyncRequest(`block/notxdetails/${hash}`, processAsyncResponse);
             },
+            setRange: function(range) {
+                if (range === app.range) {
+                    return;
+                }
+
+                CHARTIST_DATA = {
+                    labels: [],
+                    series: [],
+                };
+
+                // when the response comes in the graph will reset.
+                clearBinInterval();
+                setBinInterval(range);
+            }
         },
     })
 
@@ -146,23 +162,44 @@ onload = function() {
 
     setInterval(function() {
         asyncRequest(`ping`, processAsyncResponse);
-        asyncRequest(`chaininfo`, processAsyncResponse);
-    }, 5000);
 
-    setInterval(function() {
         if (!app.connected) {
             return;
         }
+        asyncRequest(`chaininfo`, processAsyncResponse);
+    }, 5000);
 
-        asyncRequest(`mempool/bins`, processAsyncResponse);
-    }, 15000);
+    let bin_interval = 0;
+
+    let clearBinInterval = function() {
+        clearInterval(bin_interval);
+        bin_interval = 0;
+    }
+
+    let setBinInterval = function(range) {
+        if (bin_interval !== 0) {
+            // should never happen
+            return;
+        }
+
+        bin_interval = setInterval(function() {
+            if (!app.connected) {
+                return;
+            }
+
+            asyncRequest(`mempool/bins`, processAsyncResponse);
+        }, range*60000/120);
+
+        asyncRequest(`mempool/bins/range/${range}`, processAsyncResponse);
+        app.range = range;
+    }
 
     let dealWithChaininfo = function(chaininfo) {
         app.chaininfo = chaininfo;
         app.getBlockIfRequired(chaininfo.bestblockhash);
     };
 
-    let dealWithMempoolBins = function(mempoolbins) {
+    let dealWithMempoolBins = function(mempoolbins, redraw=true) {
         app.dots = "";
 
         let truncate = 120; // 120*15 = 1800s, half an hour.
@@ -191,17 +228,23 @@ onload = function() {
 
             i++;
         };
-        if (!CHART) {
-            CHART = new Chartist.Line('.ct-chart', CHARTIST_DATA, CHARTIST_OPTIONS);
-        } else {
-            CHART.update(CHARTIST_DATA);
+        if (redraw) {
+            if (!CHART) {
+                CHART = new Chartist.Line('.ct-chart', CHARTIST_DATA, CHARTIST_OPTIONS);
+            } else {
+                CHART.update(CHARTIST_DATA);
+            }
         }
     }
 
-    let dealWithMempoolBinsThirty = function(response) {
+    let dealWithMempoolBinsRange = function(response) {
         for (let i = 0; i < response.list.length; i++) {
             let mempoolbins = response.list[i];
-            dealWithMempoolBins(mempoolbins);
+            if (i !== response.list.length-1) {
+                dealWithMempoolBins(mempoolbins, redraw=false);
+            } else {
+                dealWithMempoolBins(mempoolbins);
+            }
         }
     }
 
@@ -226,8 +269,8 @@ onload = function() {
             dealWithChaininfo(response);
         } else if (request.startsWith("block/notxdetails")) {
             dealWithBlock(response);
-        } else if (request.startsWith("mempool/bins_30m")) {
-            dealWithMempoolBinsThirty(response);
+        } else if (request.startsWith("mempool/bins/range")) {
+            dealWithMempoolBinsRange(response);
         } else if (request.startsWith("mempool/bins")) {
             dealWithMempoolBins(response);
         }
@@ -236,8 +279,7 @@ onload = function() {
     let onConnect = function() {
         app.connected = true;
         asyncRequest(`chaininfo`, processAsyncResponse);
-        // asyncRequest(`mempool/bins`, processAsyncResponse);
-        asyncRequest(`mempool/bins_30m`, processAsyncResponse);
+        setBinInterval(INITIAL_RANGE); // implicit fetch of mempool/bins/range
     }
 
     let onDisconnect = function() {
