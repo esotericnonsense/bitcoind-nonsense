@@ -26,25 +26,45 @@ td { border: 1px dotted lightgray; }
 .ct-chart .ct-line { stroke-width: 2px; }
 .ct-chart .ct-point { stroke-width: 4px; }
 
-.ct-chart .ct-series-a .ct-line, .ct-chart .ct-series-a .ct-point { stroke: #ff00f0; } /* 1000 */
-.ct-chart .ct-series-b .ct-line, .ct-chart .ct-series-b .ct-point { stroke: #ff00c0; } /* 500 */
+div.legend { float: left; }
+.ct-chart .ct-series-a .ct-line, .ct-chart .ct-series-a .ct-point { stroke: #ff00f0; }
+div#bin-2100000000000000 { background-color: #ff00f0; }
+.ct-chart .ct-series-b .ct-line, .ct-chart .ct-series-b .ct-point { stroke: #ff00c0; }
+div#bin-1000 { background-color: #ff00c0; }
 .ct-chart .ct-series-c .ct-line, .ct-chart .ct-series-c .ct-point { stroke: #ff00a0; }
+div#bin-500 { background-color: #ff00a0; }
 .ct-chart .ct-series-d .ct-line, .ct-chart .ct-series-d .ct-point { stroke: #ff0000; }
-.ct-chart .ct-series-e .ct-line, .ct-chart .ct-series-e .ct-point { stroke: #ee0000; } /* 250 */
+div#bin-400 { background-color: #ff0000; }
+.ct-chart .ct-series-e .ct-line, .ct-chart .ct-series-e .ct-point { stroke: #ee0000; }
+div#bin-300 { background-color: #ee0000; }
 .ct-chart .ct-series-f .ct-line, .ct-chart .ct-series-f .ct-point { stroke: #dd0000; }
+div#bin-250 { background-color: #dd0000; }
 .ct-chart .ct-series-g .ct-line, .ct-chart .ct-series-g .ct-point { stroke: #cc0000; }
-.ct-chart .ct-series-h .ct-line, .ct-chart .ct-series-h .ct-point { stroke: #bb0000; } /* 100 */
+div#bin-200 { background-color: #cc0000; }
+.ct-chart .ct-series-h .ct-line, .ct-chart .ct-series-h .ct-point { stroke: #bb0000; }
+div#bin-150 { background-color: #bb0000; }
 .ct-chart .ct-series-i .ct-line, .ct-chart .ct-series-i .ct-point { stroke: #aa0000; }
+div#bin-100 { background-color: #aa0000; }
 .ct-chart .ct-series-j .ct-line, .ct-chart .ct-series-j .ct-point { stroke: #990000; }
-.ct-chart .ct-series-k .ct-line, .ct-chart .ct-series-k .ct-point { stroke: #880000; } /* 25 */
+div#bin-60 { background-color: #990000; }
+.ct-chart .ct-series-k .ct-line, .ct-chart .ct-series-k .ct-point { stroke: #880000; }
+div#bin-30 { background-color: #880000; }
 .ct-chart .ct-series-l .ct-line, .ct-chart .ct-series-l .ct-point { stroke: #770000; }
+div#bin-25 { background-color: #770000; }
 .ct-chart .ct-series-m .ct-line, .ct-chart .ct-series-m .ct-point { stroke: #660000; }
-.ct-chart .ct-series-n .ct-line, .ct-chart .ct-series-n .ct-point { stroke: #000000; } /* 10 */
-.ct-chart .ct-series-o .ct-line, .ct-chart .ct-series-o .ct-point { stroke: #444444; } /* 5 */
+div#bin-20 { background-color: #660000; }
+.ct-chart .ct-series-n .ct-line, .ct-chart .ct-series-n .ct-point { stroke: #000000; }
+div#bin-15 { background-color: #000000; }
+.ct-chart .ct-series-o .ct-line, .ct-chart .ct-series-o .ct-point { stroke: #444444; }
+div#bin-10 { background-color: #444444; }
 .ct-chart .ct-series-p .ct-line, .ct-chart .ct-series-p .ct-point { stroke: #666666; }
+div#bin-5 { background-color: #666666; }
 .ct-chart .ct-series-q .ct-line, .ct-chart .ct-series-q .ct-point { stroke: #888888; }
+div#bin-4 { background-color: #888888; }
 .ct-chart .ct-series-r .ct-line, .ct-chart .ct-series-r .ct-point { stroke: #aaaaaa; }
-.ct-chart .ct-series-s .ct-line, .ct-chart .ct-series-s .ct-point { stroke: #cccccc; } /* 1 */
+div#bin-3 { background-color: #aaaaaa; }
+.ct-chart .ct-series-s .ct-line, .ct-chart .ct-series-s .ct-point { stroke: #cccccc; }
+div#bin-2 { background-color: #cccccc; }
 
 div#chooser { text-align: right; margin-bottom: 5px; margin-right: 10%; }
 .selected { background: navy; color: white; }

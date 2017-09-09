@@ -89,7 +89,7 @@
                 </thead>
                 <tbody>
                     <tr v-for="bin in mempoolbins.bins">
-                        <td>{{ bin[0] }} - {{ (bin[1] < 21*(10**14)) ? bin[1] : 'max' }}</td>
+                        <td><div class="legend" :id="`bin-${bin[1]}`">&nbsp;&nbsp;</div>{{ bin[0] }} - {{ (bin[1] < 21*(10**14)) ? bin[1] : 'max' }}</td>
                         <td>{{ bin[2] }}</td>
                         <td>{{ bin[3] }}</td>
                         <td>{{ (bin[4]/(10**5)).toFixed(2) }}</td>
