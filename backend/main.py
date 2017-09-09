@@ -172,8 +172,12 @@ def mempool_bins():
 
     return jsonify(response)
 
+ALLOWABLE_RANGES = [30, 120, 240, 480, 1440]
 @app.route("/api/mempool/bins/range/<int:minutes>")
 def mempool_bins_range(minutes):
+    if not (minutes in ALLOWABLE_RANGES):
+        return error_response("invalid range")
+
     with sqlite3.connect("database/mempoolbins.db") as conn:
         c = conn.cursor()
 
