@@ -19,7 +19,7 @@ var CHARTIST_OPTIONS = {
         type: Chartist.FixedScaleAxis,
         divisor: 5,
         labelInterpolationFnc: function(value, index) {
-            return moment(value).format('hh:mm:ss');
+            return moment(value).format('MMM DD HH:mm');
         }
     },
     axisY: {
