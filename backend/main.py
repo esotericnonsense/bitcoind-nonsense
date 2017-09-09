@@ -88,7 +88,7 @@ def bin_it(n):
 
     return MAX_BITCOINS
 
-BINS = sorted(list(set(bin_it(n) for n in range(1001))))
+BINS = sorted(list(set(bin_it(n) for n in range(1, 1001))))
 
 def bin_mempool_contents(mempoolcontents):
     bins = {
