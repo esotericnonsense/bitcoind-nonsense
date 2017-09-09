@@ -172,24 +172,6 @@ def mempool_bins():
 
     return jsonify(response)
 
-@app.route("/api/mempool/bins_30m")
-def mempool_bins_30m():
-    with sqlite3.connect("database/mempoolbins.db") as conn:
-        c = conn.cursor()
-
-        # Get the last 30 mins.
-        utc30min_ms = int(unix_time_seconds(
-            datetime.datetime.utcnow() - datetime.timedelta(minutes=30)
-        ) * 1000)
-
-        c.execute('''SELECT * FROM mempoolbins WHERE utc_ms > ?''', (utc30min_ms, ))
-        l = [
-            json.loads(r[1])
-            for r in c
-        ]
-
-    return jsonify({"list": l})
-
 @app.route("/api/mempool/bins/range/<int:minutes>")
 def mempool_bins_range(minutes):
     with sqlite3.connect("database/mempoolbins.db") as conn:
