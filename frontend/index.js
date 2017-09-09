@@ -26,6 +26,13 @@ var CHARTIST_OPTIONS = {
         low: 0,
     },
     plugins: [
+        Chartist.plugins.tooltip({
+            transformTooltipTextFnc: function(data) {
+                let [ts, bytes] = data.split(",");
+                mts = moment(parseInt(ts)).format("MMM DD HH:mm");
+                return `${mts} ${bytes}b`;
+            },
+        }),
         Chartist.plugins.ctAxisTitle({
             axisX: {
                 axisTitle: 'fee / sat/b',
