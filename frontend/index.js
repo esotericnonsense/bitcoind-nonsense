@@ -88,7 +88,7 @@ onload = function() {
             connected: false,
             now: getCurrentTime(),
             lastpong: new Date(0),
-            dots: "",
+            last_updated: new Date(0),
             chaininfo: null,
             mempoolbins: null,
             range: 0,
@@ -156,8 +156,6 @@ onload = function() {
         if (((app.now - app.lastpong) > 10) && (app.connected)) {
             onDisconnect();
         }
-
-        app.dots += "•";
     }, 1000);
 
     setInterval(function() {
@@ -200,7 +198,7 @@ onload = function() {
     };
 
     let dealWithMempoolBins = function(mempoolbins, redraw=true) {
-        app.dots = "";
+        app.last_updated = app.now;
 
         let truncate = 120; // 120*15 = 1800s, half an hour.
 
@@ -259,7 +257,7 @@ onload = function() {
         if (!app.connected) {
             onConnect();
         }
-        app.lastpong = getCurrentTime();
+        app.lastpong = app.now;
     }
 
     let processAsyncResponse = function(request, response) {
