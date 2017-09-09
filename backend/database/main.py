@@ -4,7 +4,7 @@ import json
 import datetime
 from time import sleep
 
-BACKEND_URI = "http://localhost/api"
+BACKEND_URI = "https://esotericnonsense.com/api"
 def perform_one_cycle(c, conn):
     try:
         r = requests.get("{}/mempool/bins".format(BACKEND_URI))

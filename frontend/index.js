@@ -1,5 +1,5 @@
 // TODO: base API_URL on actual URI in browser
-const API_URL = "http://localhost/api"
+const API_URL = "https://esotericnonsense.com/api"
 const ALL_BITCOINS = 21*(10**14);
 
 var CHARTIST_DATA = {
