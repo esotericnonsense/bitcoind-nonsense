@@ -3,6 +3,8 @@ const API_URL = "https://esotericnonsense.com/api"
 const ALL_BITCOINS = 21*(10**14);
 const INITIAL_RANGE = 30;
 
+var formatBytes = function(a,b){if(0==a)return"zero";var c=1024,d=b||2,e=["B","KiB","MiB"],f=Math.floor(Math.log(a)/Math.log(c));return parseFloat((a/Math.pow(c,f)).toFixed(d))+" "+e[f]};
+
 var CHARTIST_DATA = {
     labels: [],
     series: [],
@@ -30,7 +32,7 @@ var CHARTIST_OPTIONS = {
             transformTooltipTextFnc: function(data) {
                 let [ts, bytes] = data.split(",");
                 mts = moment(parseInt(ts)).format("MMM DD HH:mm");
-                return `${mts} ${bytes}b`;
+                return `${mts} ${formatBytes(bytes)}`;
             },
         }),
         Chartist.plugins.ctAxisTitle({
@@ -218,7 +220,7 @@ onload = function() {
         for (let n of mempoolbins.bins.map(x => x[6])) {
             if (CHARTIST_DATA.series.length <= i) {
                 CHARTIST_DATA.series.push({
-                    name: `${mempoolbins.bins[i][0]}+ sat/b`,
+                    name: `< ${mempoolbins.bins[i][1]}+ sat/b`,
                     data: [],
                 });
             }
