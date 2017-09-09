@@ -199,8 +199,8 @@ onload = function() {
     }
 
     let dealWithMempoolBinsThirty = function(response) {
-        for (let i = 0; i < response.length; i++) {
-            let mempoolbins = response[i];
+        for (let i = 0; i < response.list.length; i++) {
+            let mempoolbins = response.list[i];
             dealWithMempoolBins(mempoolbins);
         }
     }

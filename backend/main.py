@@ -188,7 +188,7 @@ def mempool_bins_30m():
             for r in c
         ]
 
-    return jsonify(l)
+    return jsonify({"list": l})
 
 @app.route("/api/ping")
 def ping():
