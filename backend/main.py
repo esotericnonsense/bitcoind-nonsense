@@ -3,6 +3,10 @@ from flask import Flask, jsonify
 import requests
 import math
 
+import sqlite3
+import ujson as json
+import datetime
+
 BACKEND_URI = "http://localhost:8332/rest"
 DEBUG = True
 
@@ -90,8 +94,13 @@ def bin_it(n):
 
 BINS = sorted(list(set(bin_it(n) for n in range(1, 1001))))
 
+epoch = datetime.datetime.utcfromtimestamp(0)
+def unix_time_seconds(dt):
+    return (dt - epoch).total_seconds()
+
 from collections import OrderedDict
 def bin_mempool_contents(mempoolcontents):
+    utcnow = datetime.datetime.utcnow() # a hack for now
     bins = OrderedDict(
         (b, [])
         for b in BINS
@@ -128,6 +137,7 @@ def bin_mempool_contents(mempoolcontents):
         prevbin = b
 
     return {
+        "time": unix_time_seconds(utcnow),
         "size": cum_size,
         "size_segwit": size_segwit,
         "bytes": cum_bytes,
@@ -161,6 +171,24 @@ def mempool_bins():
         return error_response("backend sent unknown format")
 
     return jsonify(response)
+
+@app.route("/api/mempool/bins_30m")
+def mempool_bins_30m():
+    with sqlite3.connect("database/mempoolbins.db") as conn:
+        c = conn.cursor()
+
+        # Get the last 30 mins.
+        utc30min_ms = int(unix_time_seconds(
+            datetime.datetime.utcnow() - datetime.timedelta(minutes=30)
+        ) * 1000)
+
+        c.execute('''SELECT * FROM mempoolbins WHERE utc_ms > ?''', (utc30min_ms, ))
+        l = [
+            json.loads(r[1])
+            for r in c
+        ]
+
+    return jsonify(l)
 
 @app.route("/api/ping")
 def ping():

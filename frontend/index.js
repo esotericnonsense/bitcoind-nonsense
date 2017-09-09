@@ -167,7 +167,7 @@ onload = function() {
 
         let truncate = 120; // 120*15 = 1800s, half an hour.
 
-        let now = new Date();
+        let utcdate = new Date(mempoolbins.time*1000);
 
         app.mempoolbins = mempoolbins;
         let i = 0;
@@ -180,7 +180,7 @@ onload = function() {
             }
 
             CHARTIST_DATA.series[i].data.push({
-                x: now,
+                x: utcdate,
                 y: n,
             });
 
@@ -198,8 +198,14 @@ onload = function() {
         }
     }
 
+    let dealWithMempoolBinsThirty = function(response) {
+        for (let i = 0; i < response.length; i++) {
+            let mempoolbins = response[i];
+            dealWithMempoolBins(mempoolbins);
+        }
+    }
+
     let dealWithBlock = function(block) {
-        // console.log(`got block ${block.hash}`);
         Vue.set(app.blocks, block.hash, block);
         if (Object.keys(app.blocks).length < 3) {
             app.getBlockIfRequired(block.previousblockhash);
@@ -220,6 +226,8 @@ onload = function() {
             dealWithChaininfo(response);
         } else if (request.startsWith("block/notxdetails")) {
             dealWithBlock(response);
+        } else if (request.startsWith("mempool/bins_30m")) {
+            dealWithMempoolBinsThirty(response);
         } else if (request.startsWith("mempool/bins")) {
             dealWithMempoolBins(response);
         }
@@ -228,7 +236,8 @@ onload = function() {
     let onConnect = function() {
         app.connected = true;
         asyncRequest(`chaininfo`, processAsyncResponse);
-        asyncRequest(`mempool/bins`, processAsyncResponse);
+        // asyncRequest(`mempool/bins`, processAsyncResponse);
+        asyncRequest(`mempool/bins_30m`, processAsyncResponse);
     }
 
     let onDisconnect = function() {

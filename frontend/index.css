@@ -45,3 +45,14 @@ td { border: 1px dotted lightgray; }
 .ct-chart .ct-series-q .ct-line, .ct-chart .ct-series-q .ct-point { stroke: #888888; }
 .ct-chart .ct-series-r .ct-line, .ct-chart .ct-series-r .ct-point { stroke: #aaaaaa; }
 .ct-chart .ct-series-s .ct-line, .ct-chart .ct-series-s .ct-point { stroke: #cccccc; } /* 1 */
+
+/* dark mode tweaks */
+/*
+body { background-color: #001534; color: white; }
+h1 { color: black; }
+a { color: lightgray; }
+th { border: 1px dotted white; }
+.ct-chart .ct-axis-title { color: darkgray; }
+.ct-chart .ct-grids line { stroke: lightgray; }
+.ct-chart .ct-labels span { color: lightgray; }
+*/
