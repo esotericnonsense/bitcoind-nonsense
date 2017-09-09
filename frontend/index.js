@@ -188,8 +188,10 @@ onload = function() {
             asyncRequest(`mempool/bins`, processAsyncResponse);
         }, range*60000/120);
 
-        asyncRequest(`mempool/bins/range/${range}`, processAsyncResponse);
         app.range = range;
+        app.last_updated = app.now; // makes next update appear cleanly
+
+        asyncRequest(`mempool/bins/range/${range}`, processAsyncResponse);
     }
 
     let dealWithChaininfo = function(chaininfo) {
