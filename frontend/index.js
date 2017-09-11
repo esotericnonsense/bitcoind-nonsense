@@ -5,59 +5,6 @@ const INITIAL_RANGE = 30;
 
 var formatBytes = function(a,b){if(0==a)return"zero";var c=1024,d=b||2,e=["B","KiB","MiB"],f=Math.floor(Math.log(a)/Math.log(c));return parseFloat((a/Math.pow(c,f)).toFixed(d))+" "+e[f]};
 
-var CHARTIST_DATA = {
-    labels: [],
-    series: [],
-};
-var CHART = null;
-var CHARTIST_OPTIONS = {
-    chartPadding: {
-        top: 0,
-        right: 0,
-        bottom: 20,
-        left: 30,
-    },
-    axisX: {
-        type: Chartist.FixedScaleAxis,
-        divisor: 5,
-        labelInterpolationFnc: function(value, index) {
-            return moment(value).format('MMM DD HH:mm');
-        }
-    },
-    axisY: {
-        low: 0,
-    },
-    plugins: [
-        Chartist.plugins.tooltip({
-            transformTooltipTextFnc: function(data) {
-                let [ts, bytes] = data.split(",");
-                mts = moment(parseInt(ts)).format("MMM DD HH:mm");
-                return `${mts} ${formatBytes(bytes)}`;
-            },
-        }),
-        Chartist.plugins.ctAxisTitle({
-            axisX: {
-                axisTitle: 'fee / sat/b',
-                axisClass: 'ct-axis-title',
-                offset: {
-                    x: 0,
-                    y: 35
-                },
-                textAnchor: 'middle'
-            },
-            axisY: {
-                axisTitle: 'cumulative size / b',
-                axisClass: 'ct-axis-title',
-                offset: {
-                    x: 0,
-                    y: -10
-                },
-                flipTitle: false
-            },
-        }),
-    ],
-}
-
 var getDateEpoch = function(d) {
     return (d.getTime() / 1000);
 }
@@ -148,10 +95,7 @@ onload = function() {
                     return;
                 }
 
-                CHARTIST_DATA = {
-                    labels: [],
-                    series: [],
-                };
+                COLUMNS = null;
 
                 // when the response comes in the graph will reset.
                 clearBinInterval();
@@ -208,41 +152,92 @@ onload = function() {
         app.getBlockIfRequired(chaininfo.bestblockhash);
     };
 
+    var CHART = null;
+    var COLUMNS = null;
+
     let dealWithMempoolBins = function(mempoolbins, redraw=true) {
         app.last_updated = app.now;
+
+        let getLabel = function(n) {
+            if (n === ALL_BITCOINS) {
+                return "max";
+            }
+            return `< ${mempoolbins.bins[i][1]} sat/b`;
+        }
 
         let truncate = 120; // 120*15 = 1800s, half an hour.
 
         let utcdate = new Date(mempoolbins.time*1000);
+        if (COLUMNS) {
+            COLUMNS[0].push(utcdate);
+        } else {
+            COLUMNS = [ ["x", utcdate] ];
+        }
 
-        app.mempoolbins = mempoolbins;
+        let excess_entries = (COLUMNS[0].length - truncate) - 1;
+        if (excess_entries > 0) {
+            COLUMNS[0] = COLUMNS[0].slice(excess_entries);
+            COLUMNS[0][0] = "x";
+        }
+
         let i = 0;
         for (let n of mempoolbins.bins.map(x => x[6])) {
-            if (CHARTIST_DATA.series.length <= i) {
-                CHARTIST_DATA.series.push({
-                    name: `< ${mempoolbins.bins[i][1]}+ sat/b`,
-                    data: [],
-                });
+            if ((COLUMNS.length - 2) < i) {
+                let label = getLabel(mempoolbins.bins[i][1]);
+                COLUMNS.push([label]);
             }
 
-            CHARTIST_DATA.series[i].data.push({
-                x: utcdate,
-                y: n,
-            });
+            COLUMNS[i+1].push(n);
 
-            let l = CHARTIST_DATA.series[i].data.length - truncate;
-            if (l > 0) {
-                CHARTIST_DATA.series[i].data = CHARTIST_DATA.series[i].data.slice(l);
+            if (excess_entries > 0) {
+                COLUMNS[i+1] = COLUMNS[i+1].slice(excess_entries);
+                let label = getLabel(mempoolbins.bins[i][1]);
+                COLUMNS[i+1][0] = label;
             };
 
             i++;
         };
+
         if (redraw) {
             if (!CHART) {
-                CHART = new Chartist.Line('.ct-chart', CHARTIST_DATA, CHARTIST_OPTIONS);
+                CHART = c3.generate({
+                    bindto: "#mempoolchart",
+                    data: {
+                        x: "x",
+                        columns: COLUMNS,
+                    },
+                    axis: {
+                        x: {
+                            type: "timeseries",
+                            padding: { left: 0, right: 0 },
+                            tick: {
+                                count: 7,
+                                format: function (v) { return moment(v).format('MMM DD HH:mm'); },
+                            },
+                        },
+                        y: {
+                            min: 0,
+                            padding: { bottom: 0 },
+                        },
+                    },
+                    legend: {
+                        position: "right",
+                    },
+                    grid: {
+                        x: { show: true },
+                        y: { show: true },
+                    },
+                    color: {
+                        pattern: ["#ff00f0", "#ff00c0", "#ff00a0", "#ff0000", "#ee0000", "#dd0000", "#cc0000", "#bb0000", "#aa0000", "#990000", "#880000", "#770000", "#660000", "#000000", "#444444", "#666666", "#888888", "#aaaaaa", "#cccccc"],
+                    },
+                });
             } else {
-                CHART.update(CHARTIST_DATA);
+                CHART.load({
+                    columns: COLUMNS,
+                });
             }
+
+            app.mempoolbins = mempoolbins;
         }
     }
 
