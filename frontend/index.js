@@ -47,6 +47,7 @@ onload = function() {
             last_updated: new Date(0),
             chaininfo: null,
             mempoolbins: null,
+            data: 6,
             range: 0,
             blocks: {},
         },
@@ -100,7 +101,21 @@ onload = function() {
                 // when the response comes in the graph will reset.
                 clearBinInterval();
                 setBinInterval(range);
-            }
+            },
+            setData: function(data) {
+                if (data === app.data) {
+                    return;
+                }
+
+                app.data = data;
+
+                // TODO: this is pretty hacky.
+                COLUMNS = null;
+
+                // when the response comes in the graph will reset.
+                clearBinInterval();
+                setBinInterval(app.range);
+            },
         },
     })
 
@@ -181,7 +196,7 @@ onload = function() {
         }
 
         let i = 0;
-        for (let n of mempoolbins.bins.map(x => x[6])) {
+        for (let n of mempoolbins.bins.map(x => x[app.data])) {
             if ((COLUMNS.length - 2) < i) {
                 let label = getLabel(mempoolbins.bins[i][1]);
                 COLUMNS.push([label]);
