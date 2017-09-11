@@ -1,5 +1,5 @@
 // TODO: base API_URL on actual URI in browser
-const API_URL = "https://esotericnonsense.com/api"
+const API_URL = `${window.location.protocol}//${window.location.host}/api`
 const ALL_BITCOINS = 21*(10**14);
 const INITIAL_RANGE = 30;
 
