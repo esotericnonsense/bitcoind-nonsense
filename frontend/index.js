@@ -196,13 +196,21 @@ onload = function() {
         }
 
         let i = 0;
+        let divisor = 0;
+        if (app.data === 7) {
+            divisor = 100000;
+        }
         for (let n of mempoolbins.bins.map(x => x[app.data])) {
             if ((COLUMNS.length - 2) < i) {
                 let label = getLabel(mempoolbins.bins[i][1]);
                 COLUMNS.push([label]);
             }
 
-            COLUMNS[i+1].push(n);
+            if (divisor) {
+                COLUMNS[i+1].push(n/divisor);
+            } else {
+                COLUMNS[i+1].push(n);
+            }
 
             if (excess_entries > 0) {
                 COLUMNS[i+1] = COLUMNS[i+1].slice(excess_entries);
