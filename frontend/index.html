@@ -23,6 +23,28 @@
             </h1>
         </div>
 
+        <div class="section" id="tab-chooser">
+            <span
+                :class="tab === 'mempool-chart' ? 'selected' : 'deselected'"
+                v-on:click="setTab('mempool-chart')">
+                mempool chart
+            </span>
+            <span
+                :class="tab === 'mempool-table' ? 'selected' : 'deselected'"
+                v-on:click="setTab('mempool-table')">
+                mempool table
+            </span>
+            <span
+                :class="tab === 'blocks' ? 'selected' : 'deselected'"
+                v-on:click="setTab('blocks')">
+                blocks
+            </span>
+        </div>
+
+        <div id="tab-mempool-chart" class="tab"
+            :class="tab === 'mempool-chart' ? 'visible' : 'invisible'"
+        >
+
         <div class="section" id="chooser">
             <span
                 :class="data === 5 ? 'selected' : 'deselected'"
@@ -86,6 +108,12 @@
 
         <div id="mempoolchart"></div>
 
+        </div>
+
+        <div id="tab-mempool-table" class="tab"
+            :class="tab === 'mempool-table' ? 'visible' : 'invisible'"
+        >
+
         <div class="section" v-if="mempoolbins">
             <h2>mempool info (next update in {{ Math.max(0, Math.floor(range/2 - (now - last_updated))) }}s)</h2>
             <p>
@@ -132,6 +160,12 @@
             </table>
         </div>
 
+        </div>
+
+        <div id="tab-blocks" class="tab"
+            :class="tab === 'blocks' ? 'visible' : 'invisible'"
+        >
+
         <div class="section" v-if="blocks">
             <h2>blocks</h2>
             <table>
@@ -153,6 +187,9 @@
                 </tbody>
             </table>
         </div>
+
+        </div>
+
         <div class="section" id="donations">
             <h2>donations</h2>
             <p>

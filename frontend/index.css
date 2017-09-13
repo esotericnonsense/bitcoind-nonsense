@@ -11,6 +11,8 @@ div#header.connected { background-color: #bbffbb; }
 div#header.disconnected { background-color: red; }
 div#header h1 { text-align: center; padding: 1vw; }
 
+div.invisible { display: none; }
+
 div.section { width: 88%; margin: 0 auto; }
 div.section h2 { padding: 0.2vw 0; border-bottom: 2px dashed lightgray; }
 

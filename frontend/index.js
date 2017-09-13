@@ -49,6 +49,7 @@ onload = function() {
             mempoolbins: null,
             data: 6,
             range: 0,
+            tab: "mempool-chart",
             blocks: {},
         },
         filters: {
@@ -115,6 +116,9 @@ onload = function() {
                 // when the response comes in the graph will reset.
                 clearBinInterval();
                 setBinInterval(app.range);
+            },
+            setTab: function(tab) {
+                app.tab = tab;
             },
         },
     })
