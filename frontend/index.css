@@ -41,6 +41,8 @@ div#chooser span#last_leftside_chooser { margin-right: 1vw; }
 }
 .deselected { border: 1px dotted lightgray; }
 
+[v-cloak] { display: none; }
+
 /* dark mode tweaks */
 /*
 body { background-color: #001534; color: white; }
