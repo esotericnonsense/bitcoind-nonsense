@@ -281,7 +281,7 @@ onload = function() {
 
     let dealWithBlock = function(block) {
         Vue.set(app.blocks, block.hash, block);
-        if (Object.keys(app.blocks).length < 3) {
+        if (Object.keys(app.blocks).length < 10) {
             app.getBlockIfRequired(block.previousblockhash);
         }
     }
