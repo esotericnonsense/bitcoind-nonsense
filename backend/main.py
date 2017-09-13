@@ -172,7 +172,7 @@ def mempool_bins():
 
     return jsonify(response)
 
-ALLOWABLE_RANGES = [30, 120, 240, 480, 1440]
+ALLOWABLE_RANGES = [30, 120, 240, 480, 1440, 2880, 5760, 10080]
 @app.route("/api/mempool/bins/range/<int:minutes>")
 def mempool_bins_range(minutes):
     if not (minutes in ALLOWABLE_RANGES):
