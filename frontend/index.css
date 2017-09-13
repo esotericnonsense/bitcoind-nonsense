@@ -25,6 +25,10 @@ th, td { text-align: center; }
 th { border: 1px dotted black; }
 td { border: 1px dotted lightgray; }
 
+span { border-radius: 10px; }
+div#tab-chooser span { transition: background-color 0.1s ease-in, color 0.1s ease-in; }
+div#mempool-chart-chooser span { transition: background-color 0.5s ease-in, color 0.5s ease-in; }
+
 div#mempool-chart-chooser { text-align: right; margin-bottom: 5px; margin-right: 6%; }
 div#mempool-chart-chooser span#last_leftside_chooser { margin-right: 1vw; }
 .selected { background: navy; color: white; }
