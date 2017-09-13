@@ -25,8 +25,8 @@ th, td { text-align: center; }
 th { border: 1px dotted black; }
 td { border: 1px dotted lightgray; }
 
-div#chooser { text-align: right; margin-bottom: 5px; margin-right: 6%; }
-div#chooser span#last_leftside_chooser { margin-right: 1vw; }
+div#mempool-chart-chooser { text-align: right; margin-bottom: 5px; margin-right: 6%; }
+div#mempool-chart-chooser span#last_leftside_chooser { margin-right: 1vw; }
 .selected { background: navy; color: white; }
 .selected, .deselected {
     /* css mate. */
