@@ -47,6 +47,7 @@ onload = function() {
             last_updated: new Date(0),
             chaininfo: null,
             mempoolbins: null,
+            peers: null,
             data: 6,
             range: 0,
             tab: "mempool-chart",
@@ -137,6 +138,7 @@ onload = function() {
             return;
         }
         asyncRequest(`chaininfo`, processAsyncResponse);
+        asyncRequest(`peerinfo`, processAsyncResponse);
     }, 5000);
 
     let bin_interval = 0;
@@ -170,6 +172,10 @@ onload = function() {
         app.chaininfo = chaininfo;
         app.getBlockIfRequired(chaininfo.bestblockhash);
     };
+
+    let dealWithPeerinfo = function(peerinfo) {
+        app.peers = peerinfo;
+    }
 
     var CHART = null;
     var COLUMNS = null;
@@ -296,8 +302,10 @@ onload = function() {
     let processAsyncResponse = function(request, response) {
         if (request.startsWith("ping")) {
             dealWithPing(response);
-        } if (request.startsWith("chaininfo")) {
+        } else if (request.startsWith("chaininfo")) {
             dealWithChaininfo(response);
+        } else if (request.startsWith("peerinfo")) {
+            dealWithPeerinfo(response);
         } else if (request.startsWith("block/notxdetails")) {
             dealWithBlock(response);
         } else if (request.startsWith("mempool/bins/range")) {
@@ -310,6 +318,7 @@ onload = function() {
     let onConnect = function() {
         app.connected = true;
         asyncRequest(`chaininfo`, processAsyncResponse);
+        asyncRequest(`peerinfo`, processAsyncResponse);
         setBinInterval(INITIAL_RANGE); // implicit fetch of mempool/bins/range
     }
 

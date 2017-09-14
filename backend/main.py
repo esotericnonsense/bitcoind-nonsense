@@ -194,6 +194,85 @@ def mempool_bins_range(minutes):
 
     return jsonify({"list": l})
 
+def form_rpc_request(req, params=[], ident="0"):
+    return {
+        "jsonrpc": "2.0",
+        "id": ident,
+        "method": req,
+        "params": params,
+    }
+
+"""
+def form_batch_rpc_request(reqs): # list of tuples [(req, params)]
+    l = []
+    i = 0
+    print(reqs)
+    for req, params in reqs:
+        l.append(form_rpc_request(req, str(i), params))
+        i += 1
+
+    print(l)
+    return json.dumps(l)
+"""
+
+import base64
+def parse_rpc_config(path):
+    with open(path, "r") as f:
+        cfg = {}
+        for line in f:
+            key, param = line.replace("\n", "").split("=", 1)
+            cfg[key] = param
+
+    rpcdetails = ":".join([cfg["rpcuser"], cfg["rpcpassword"]])
+    rpcauth = base64.encodestring(bytes(rpcdetails, "utf-8"))[:-1].decode("utf-8")
+
+    rpc_headers = {
+        "Authorization": "Basic {}".format(rpcauth),
+        "Content-Type": "text/plain",
+    }
+
+    rpc_url = cfg["rpcurl"]
+
+    return rpc_url, rpc_headers
+
+RPC_URL, RPC_HEADERS = parse_rpc_config("rpc.conf")
+
+def call_rpc(req):
+    r = requests.post(
+        RPC_URL,
+        headers=RPC_HEADERS,
+        data=json.dumps(form_rpc_request(req))
+    )
+
+    return r.json()
+
+@app.route("/api/peerinfo")
+def peerinfo():
+    d = call_rpc("getpeerinfo")
+    if d["error"]:
+        return error_response("error from backend")
+
+    relevant_keys = [
+        "addr",
+        "bytesrecv",
+        "bytessent",
+        "conntime",
+        "inbound",
+        "synced_blocks",
+        "subver",
+    ]
+
+    resp = [
+        {
+            key: peer[key]
+            for key in relevant_keys
+            if key in peer
+        }
+        for peer in d["result"]
+    ]
+
+    return jsonify(resp)
+
 @app.route("/api/ping")
 def ping():
     return jsonify({"pong": True})

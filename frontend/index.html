@@ -39,6 +39,11 @@
                 v-on:click="setTab('blocks')">
                 blocks
             </span>
+            <span
+                :class="tab === 'peers' ? 'selected' : 'deselected'"
+                v-on:click="setTab('peers')">
+                peers
+            </span>
         </div>
 
         <div id="tab-mempool-chart" class="tab"
@@ -183,6 +188,40 @@
                         <td>{{ block.height }}</td>
                         <td>{{ block.hash }}</td>
                         <td>{{ block.size }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        </div>
+
+        <div id="tab-peers" class="tab"
+            :class="tab === 'peers' ? 'visible' : 'invisible'"
+        >
+
+        <div class="section" v-if="peers">
+            <h2>peers</h2>
+            <table>
+                <thead>
+                    <th>address</th>
+                    <th>subver</th>
+                    <th>inbound</th>
+                    <th>connected</th>
+                    <th>blocks</th>
+                    <th>recv / MiB</th>
+                    <th>sent / MiB</th>
+                </thead>
+                <tbody>
+                    <tr
+                        v-for="peer in peers"
+                    >
+                        <td>{{ peer.addr }}</td>
+                        <td>{{ peer.subver.replace("<", "").replace(">", "") }}</td>
+                        <td>{{ peer.inbound ? "y" : "n" }}</td>
+                        <td>{{ (now - peer.conntime) | timeInterval }}</td>
+                        <td>{{ peer.synced_blocks }}</td>
+                        <td>{{ (peer.bytesrecv/1048576).toFixed(2) }}</td>
+                        <td>{{ (peer.bytessent/1048576).toFixed(2) }}</td>
                     </tr>
                 </tbody>
             </table>
