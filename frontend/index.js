@@ -47,6 +47,7 @@ onload = function() {
             last_updated: new Date(0),
             chaininfo: null,
             mempoolbins: null,
+            nettotals: null,
             peers: null,
             data: 6,
             range: 0,
@@ -160,12 +161,14 @@ onload = function() {
             }
 
             asyncRequest(`mempool/bins`, processAsyncResponse);
+            asyncRequest(`nettotals`, processAsyncResponse);
         }, range*60000/120);
 
         app.range = range;
         app.last_updated = app.now; // makes next update appear cleanly
 
         asyncRequest(`mempool/bins/range/${range}`, processAsyncResponse);
+        asyncRequest(`nettotals/range/${range}`, processAsyncResponse);
     }
 
     let dealWithChaininfo = function(chaininfo) {
@@ -299,6 +302,103 @@ onload = function() {
         app.lastpong = app.now;
     }
 
+    var NETCHART = null;
+    var NETCOLUMNS = null;
+    var NETLABELS = {
+        "totalbytesrecv": "in / MiB",
+        "totalbytessent": "out / MiB",
+    }
+
+    let dealWithNettotals = function(nettotals, redraw=true) {
+        // app.last_updated = app.now;
+
+        let truncate = 120; // 120*15 = 1800s, half an hour.
+
+        let utcdate = new Date(nettotals.time*1000);
+        if (NETCOLUMNS) {
+            NETCOLUMNS[0].push(utcdate);
+        } else {
+            NETCOLUMNS = [ ["x", utcdate] ];
+        }
+
+        let excess_entries = (NETCOLUMNS[0].length - truncate) - 1;
+        if (excess_entries > 0) {
+            NETCOLUMNS[0] = NETCOLUMNS[0].slice(excess_entries);
+            NETCOLUMNS[0][0] = "x";
+        }
+
+        let i = 0;
+        for (let key of ["totalbytesrecv", "totalbytessent"]) {
+            n = nettotals[key];
+
+            if ((NETCOLUMNS.length - 2) < i) {
+                NETCOLUMNS.push([NETLABELS[key]]);
+            }
+
+            NETCOLUMNS[i+1].push(n/1048576);
+
+            if (excess_entries > 0) {
+                NETCOLUMNS[i+1] = NETCOLUMNS[i+1].slice(excess_entries);
+                NETCOLUMNS[i+1][0] = NETLABELS[key];
+            };
+
+            i++;
+        };
+
+        if (redraw) {
+            if (!NETCHART) {
+                NETCHART = c3.generate({
+                    bindto: "#networkchart",
+                    data: {
+                        x: "x",
+                        columns: NETCOLUMNS,
+                    },
+                    axis: {
+                        x: {
+                            type: "timeseries",
+                            padding: { left: 0, right: 0 },
+                            tick: {
+                                count: 7,
+                                format: function (v) { return moment(v).format('MMM DD HH:mm'); },
+                            },
+                        },
+                        y: {
+                            min: 0,
+                            padding: { bottom: 0 },
+                        },
+                    },
+                    legend: {
+                        position: "right",
+                    },
+                    grid: {
+                        x: { show: true },
+                        y: { show: true },
+                    },
+                    color: {
+                        pattern: ["darkgreen", "crimson"],
+                    },
+                });
+            } else {
+                NETCHART.load({
+                    columns: NETCOLUMNS,
+                });
+            }
+
+            app.nettotals = nettotals;
+        }
+    }
+
+    let dealWithNettotalsRange = function(response) {
+        for (let i = 0; i < response.list.length; i++) {
+            let nettotals = response.list[i];
+            if (i !== response.list.length-1) {
+                dealWithNettotals(nettotals, redraw=false);
+            } else {
+                dealWithNettotals(nettotals);
+            }
+        }
+    }
+
     let processAsyncResponse = function(request, response) {
         if (request.startsWith("ping")) {
             dealWithPing(response);
@@ -312,6 +412,10 @@ onload = function() {
             dealWithMempoolBinsRange(response);
         } else if (request.startsWith("mempool/bins")) {
             dealWithMempoolBins(response);
+        } else if (request.startsWith("nettotals/range")) {
+            dealWithNettotalsRange(response);
+        } else if (request.startsWith("nettotals")) {
+            dealWithNettotals(response);
         }
     }
 
@@ -319,7 +423,7 @@ onload = function() {
         app.connected = true;
         asyncRequest(`chaininfo`, processAsyncResponse);
         asyncRequest(`peerinfo`, processAsyncResponse);
-        setBinInterval(INITIAL_RANGE); // implicit fetch of mempool/bins/range
+        setBinInterval(INITIAL_RANGE); // implicit fetch of mempool/bins/range, nettotals/range
     }
 
     let onDisconnect = function() {

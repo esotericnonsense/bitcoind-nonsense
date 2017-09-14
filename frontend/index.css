@@ -14,7 +14,7 @@ div.invisible { display: none; }
 div.section { width: 88%; margin: 0 auto; }
 div.section h2 { padding: 0.2vw 0; border-bottom: 2px dashed lightgray; }
 
-div#mempoolchart { width: 90%; height: 500px; margin: 0 auto; }
+div#mempoolchart, div#networkchart { width: 90%; height: 500px; margin: 0 auto; }
 
 div#donations img { width: 100px; }
 
@@ -26,12 +26,15 @@ td { border: 1px dotted lightgray; }
 span { border-radius: 10px; }
 div#tab-chooser span { transition: background-color 0.1s ease-in, color 0.1s ease-in; }
 div#tab-chooser span.selected { background: navy; color: white; }
+div#tab-chooser { margin-bottom: 5px; }
 
-div#mempool-chart-chooser span { transition: background-color 0.5s ease-in, color 0.5s ease-in; }
+div#network-chart-chooser { text-align: right; margin-bottom: 5px; margin-right: 6%; }
+div#network-chart-chooser span { transition: background-color 0.5s ease-in, color 0.5s ease-in; }
+div#network-chart-chooser span.selected { background: darkred; color: white; }
 
 div#mempool-chart-chooser { text-align: right; margin-bottom: 5px; margin-right: 6%; }
+div#mempool-chart-chooser span { transition: background-color 0.5s ease-in, color 0.5s ease-in; }
 div#mempool-chart-chooser span#last_leftside_chooser { margin-right: 1vw; }
-
 div#mempool-chart-chooser span.selected { background: darkgreen; color: white; }
 
 .selected, .deselected {

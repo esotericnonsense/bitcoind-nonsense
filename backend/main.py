@@ -272,8 +272,54 @@ def peerinfo():
             for peer in d["result"]
         ],
     }
+    return jsonify(resp)
+
+@app.route("/api/nettotals")
+def nettotals():
+    d = call_rpc("getnettotals")
+    if d["error"]:
+        return error_response("error from backend")
+
+    if not d["result"]:
+        return error_response("error from backend")
+
+    relevant_keys = [
+        "totalbytesrecv",
+        "totalbytessent",
+    ]
+
+    resp = {
+        key: d["result"][key]
+        for key in relevant_keys
+        if key in d["result"]
+    }
+
+    utcnow = datetime.datetime.utcnow()
+    resp["time"] = unix_time_seconds(utcnow)
 
     return jsonify(resp)
+
+ALLOWABLE_RANGES = [30, 120, 240, 480, 1440, 2880, 5760, 10080]
+@app.route("/api/nettotals/range/<int:minutes>")
+def nettotals_range(minutes):
+    if not (minutes in ALLOWABLE_RANGES):
+        return error_response("invalid range")
+
+    with sqlite3.connect("database/mempoolbins.db") as conn:
+        c = conn.cursor()
+
+        # Get the last two hours.
+        utc_range_ms = int(unix_time_seconds(
+            datetime.datetime.utcnow() - datetime.timedelta(minutes=minutes)
+        ) * 1000)
+
+        c.execute('''SELECT * FROM (SELECT * FROM nettotals WHERE utc_ms > ? ORDER BY random() LIMIT 120) ORDER BY utc_ms''', (utc_range_ms, ))
+        l = [
+            json.loads(r[1])
+            for r in c
+        ]
+
+    return jsonify({"list": l})
 
 @app.route("/api/ping")
 def ping():

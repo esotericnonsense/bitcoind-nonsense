@@ -44,6 +44,11 @@
                 v-on:click="setTab('peers')">
                 peers
             </span>
+            <span
+                :class="tab === 'network-chart' ? 'selected' : 'deselected'"
+                v-on:click="setTab('network-chart')">
+                network chart
+            </span>
         </div>
 
         <div id="tab-mempool-chart" class="tab"
@@ -226,6 +231,59 @@
                 </tbody>
             </table>
         </div>
+
+        </div>
+
+        <div id="tab-network-chart" class="tab"
+            :class="tab === 'network-chart' ? 'visible' : 'invisible'"
+        >
+
+        <div class="section" id="network-chart-chooser">
+            <span
+                :class="range === 30 ? 'selected' : 'deselected'"
+                v-on:click="setRange(30)">
+                30m
+            </span>
+            <span
+                :class="range === 120 ? 'selected' : 'deselected'"
+                v-on:click="setRange(120)">
+                2h
+            </span>
+            <span
+                :class="range === 240 ? 'selected' : 'deselected'"
+                v-on:click="setRange(240)">
+                4h
+            </span>
+            <span
+                :class="range === 480 ? 'selected' : 'deselected'"
+                v-on:click="setRange(480)">
+                8h
+            </span>
+            <span
+                :class="range === 1440 ? 'selected' : 'deselected'"
+                v-on:click="setRange(1440)">
+                24h
+            </span>
+            <!--
+            <span
+                :class="range === 2880 ? 'selected' : 'deselected'"
+                v-on:click="setRange(2880)">
+                2d
+            </span>
+            <span
+                :class="range === 5760 ? 'selected' : 'deselected'"
+                v-on:click="setRange(5760)">
+                4d
+            </span>
+            <span
+                :class="range === 10080 ? 'selected' : 'deselected'"
+                v-on:click="setRange(10080)">
+                7d
+            </span>
+            -->
+        </div>
+
+        <div id="networkchart"></div>
 
         </div>
 
