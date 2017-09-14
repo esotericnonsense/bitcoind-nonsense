@@ -174,7 +174,7 @@ onload = function() {
     };
 
     let dealWithPeerinfo = function(peerinfo) {
-        app.peers = peerinfo;
+        app.peers = peerinfo.peerinfo;
     }
 
     var CHART = null;

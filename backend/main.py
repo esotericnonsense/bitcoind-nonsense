@@ -262,14 +262,16 @@ def peerinfo():
         "subver",
     ]
 
-    resp = [
-        {
-            key: peer[key]
-            for key in relevant_keys
-            if key in peer
-        }
-        for peer in d["result"]
-    ]
+    resp = {
+        "peerinfo": [
+            {
+                key: peer[key]
+                for key in relevant_keys
+                if key in peer
+            }
+            for peer in d["result"]
+        ],
+    }
 
     return jsonify(resp)
 
