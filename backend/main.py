@@ -186,7 +186,10 @@ def mempool_bins_range(minutes):
             datetime.datetime.utcnow() - datetime.timedelta(minutes=minutes)
         ) * 1000)
 
-        c.execute('''SELECT * FROM (SELECT * FROM mempoolbins WHERE utc_ms > ? ORDER BY random() LIMIT 120) ORDER BY utc_ms''', (utc_range_ms, ))
+        divisor = 500*minutes # get 120 entries.
+
+        c.execute('''SELECT * FROM mempoolbins a INNER JOIN (SELECT MIN(utc_ms) AS ms FROM mempoolbins WHERE utc_ms > ? GROUP BY utc_ms/?) b ON a.utc_ms = b.ms''', (utc_range_ms, divisor, ));
+
         l = [
             json.loads(r[1])
             for r in c
@@ -313,7 +316,9 @@ def nettotals_range(minutes):
             datetime.datetime.utcnow() - datetime.timedelta(minutes=minutes)
         ) * 1000)
 
-        c.execute('''SELECT * FROM (SELECT * FROM nettotals WHERE utc_ms > ? ORDER BY random() LIMIT 120) ORDER BY utc_ms''', (utc_range_ms, ))
+        divisor = 500*minutes # get 120 entries.
+
+        c.execute('''SELECT * FROM nettotals a INNER JOIN (SELECT MIN(utc_ms) AS ms FROM nettotals WHERE utc_ms > ? GROUP BY utc_ms/?) b ON a.utc_ms = b.ms''', (utc_range_ms, divisor, ));
         l = [
             json.loads(r[1])
             for r in c
