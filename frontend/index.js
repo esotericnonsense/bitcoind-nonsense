@@ -212,6 +212,8 @@ onload = function() {
         let divisor = 0;
         if (app.data === 7) {
             divisor = 100000;
+        } else if (app.data === 6) {
+            divisor = 1048576;
         }
         for (let n of mempoolbins.bins.map(x => x[app.data])) {
             if ((COLUMNS.length - 2) < i) {
@@ -265,6 +267,19 @@ onload = function() {
                     },
                     color: {
                         pattern: ["#ff00f0", "#ff00c0", "#ff00a0", "#ff0000", "#ee0000", "#dd0000", "#cc0000", "#bb0000", "#aa0000", "#990000", "#880000", "#770000", "#660000", "#000000", "#444444", "#666666", "#888888", "#aaaaaa", "#cccccc"],
+                    },
+                    tooltip: {
+                        format: {
+                            value: function (value, ratio, id) {
+                                if (app.data === 5) {
+                                    return `${value} tx`;
+                                } else if (app.data === 6) {
+                                    return `${value.toFixed(3)} MiB`;
+                                } else if (app.data === 7) {
+                                    return `${value.toFixed(2)} mBTC`;
+                                }
+                            },
+                        },
                     },
                 });
             } else {
