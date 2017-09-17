@@ -48,6 +48,103 @@ def sanity_check_blockhash(h):
 
     return True
 
+def block_subsidy(height, interval=210000):
+    # ported from Bitcoin Core, src/main.cpp.
+
+    # this function suffers from floating point issues, do not use
+    #   for critical purposes.
+
+    halvings = height // interval;
+    if halvings >= 64:
+        return 0
+
+    subsidy = 50
+    subsidy /= 2**halvings
+    return subsidy
+
+def process_block(d):
+    relevant_keys = [
+        "chainwork",
+        "difficulty",
+        "hash",
+        "height",
+        "time",
+        "previousblockhash",
+        "size",
+        "weight",
+    ]
+
+    resp = {
+        key: d[key]
+        for key in relevant_keys
+        if key in d
+    }
+
+    coinbase = d["tx"][0]
+
+    block_reward = sum(
+        vout["value"] for vout in coinbase["vout"]
+    )
+    subsidy = block_subsidy(d["height"])
+
+    resp["subsidy"] = subsidy
+    resp["fees"] = block_reward - subsidy
+    resp["tx_count"] = len(d["tx"])
+
+    return resp
+
+def get_block_from_db(h):
+    with sqlite3.connect("database/mempoolbins.db") as conn:
+        c = conn.cursor()
+
+        c.execute('''SELECT json FROM blockinfo WHERE hash = ?''', (h, ))
+        blocks = [ item for item in c ]
+        if len(blocks) != 1:
+            return None
+
+        return json.loads(blocks[0][0])
+
+def put_block_into_db(b):
+    with sqlite3.connect("database/mempoolbins.db") as conn:
+        c = conn.cursor()
+
+        c.execute('''INSERT INTO blockinfo VALUES (?, ?, ?)''',
+            (b["hash"], b["height"], json.dumps(b), ))
+
+        conn.commit()
+
+@app.route("/api/blockinfo/<string:h>")
+def block(h):
+    if not sanity_check_blockhash(h):
+        return error_response("invalid hash value")
+
+    b = get_block_from_db(h)
+    if b:
+        print("Got block from db")
+        return jsonify(b)
+
+    try:
+        r = requests.get("{}/block/{}.json".format(BACKEND_URI, h))
+        if r.status_code != 200:
+            return error_response("backend: http error {}".format(r.status_code))
+    except:
+        if DEBUG:
+            print(r.text)
+            import traceback
+            traceback.print_exc()
+        return error_response("backend unavailable")
+
+    try:
+        d = r.json()
+    except requests.json.decoder.JSONDecodeError:
+        return error_response("backend sent non-json")
+
+    b = process_block(d)
+    put_block_into_db(b)
+    print("Put block into db")
+
+    return jsonify(b)
+
 @app.route("/api/block/notxdetails/<string:h>")
 def block_notxdetails(h):
     if not sanity_check_blockhash(h):

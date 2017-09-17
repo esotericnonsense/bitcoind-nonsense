@@ -63,11 +63,11 @@ onload = function() {
                 let m = Math.floor((timeinterval / 60) % 60);
                 let s = Math.floor(timeinterval % 60);
                 if (h) {
-                    return `${h} h ${m} min`;
+                    return `${h}h ${m}m`;
                 } else if (m) {
-                    return `${m} min ${s} sec`;
+                    return `${m}m ${s}s`;
                 } else {
-                    return `${s} sec`;
+                    return `${s}s`;
                 }
             },
             formatBin: function(bin) {
@@ -92,7 +92,7 @@ onload = function() {
                     return;
                 }
 
-                asyncRequest(`block/notxdetails/${hash}`, processAsyncResponse);
+                asyncRequest(`blockinfo/${hash}`, processAsyncResponse);
             },
             setRange: function(range) {
                 if (range === app.range) {
@@ -305,7 +305,7 @@ onload = function() {
 
     let dealWithBlock = function(block) {
         Vue.set(app.blocks, block.hash, block);
-        if (Object.keys(app.blocks).length < 10) {
+        if (Object.keys(app.blocks).length < 12) {
             app.getBlockIfRequired(block.previousblockhash);
         }
     }
@@ -421,7 +421,7 @@ onload = function() {
             dealWithChaininfo(response);
         } else if (request.startsWith("peerinfo")) {
             dealWithPeerinfo(response);
-        } else if (request.startsWith("block/notxdetails")) {
+        } else if (request.startsWith("blockinfo")) {
             dealWithBlock(response);
         } else if (request.startsWith("mempool/bins/range")) {
             dealWithMempoolBinsRange(response);

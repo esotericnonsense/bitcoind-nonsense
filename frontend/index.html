@@ -181,7 +181,10 @@
                     <th>age</th>
                     <th>height</th>
                     <th>hash</th>
-                    <th>size</th>
+                    <th>fees / mBTC</th>
+                    <th>tx</th>
+                    <th>log<sub>2</sub>(work)</th>
+                    <th>size / MiB</th>
                 </thead>
                 <tbody>
                     <tr
@@ -189,8 +192,11 @@
                     >
                         <td>{{ (now - block.time) | timeInterval }}</td>
                         <td>{{ block.height }}</td>
-                        <td>{{ block.hash }}</td>
-                        <td>{{ block.size }}</td>
+                        <td class="blockhashtd">{{ block.hash }}</td>
+                        <td>{{ (block.fees*1000).toFixed(2) }}</td>
+                        <td>{{ block.tx_count }}</td>
+                        <td>{{ (Math.log(parseInt(block.chainwork, 16))/Math.log(2)).toFixed(3) }}</td>
+                        <td>{{ (block.size/1048576).toFixed(3) }}</td>
                     </tr>
                 </tbody>
             </table>
