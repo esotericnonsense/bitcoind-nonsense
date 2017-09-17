@@ -182,6 +182,7 @@
                     <th>height</th>
                     <th>hash</th>
                     <th>fees / mBTC</th>
+                    <th>fees / %</th>
                     <th>tx</th>
                     <th>log<sub>2</sub>(work)</th>
                     <th>size / MiB</th>
@@ -194,6 +195,7 @@
                         <td>{{ block.height }}</td>
                         <td class="blockhashtd">{{ block.hash }}</td>
                         <td>{{ (block.fees*1000).toFixed(2) }}</td>
+                        <td>{{ (block.fees*100/(block.fees + block.subsidy)).toFixed(2) }}</td>
                         <td>{{ block.tx_count }}</td>
                         <td>{{ (Math.log(parseInt(block.chainwork, 16))/Math.log(2)).toFixed(3) }}</td>
                         <td>{{ (block.size/1048576).toFixed(3) }}</td>
