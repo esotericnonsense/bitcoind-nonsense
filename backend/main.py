@@ -87,9 +87,15 @@ def process_block(d):
     )
     subsidy = block_subsidy(d["height"])
 
+    tx_count_segwit = 0
+    for tx in d["tx"]:
+        if tx["hash"] != tx["txid"]:
+            tx_count_segwit += 1
+
     resp["subsidy"] = subsidy
     resp["fees"] = block_reward - subsidy
     resp["tx_count"] = len(d["tx"])
+    resp["tx_count_segwit"] = tx_count_segwit
 
     return resp
 
