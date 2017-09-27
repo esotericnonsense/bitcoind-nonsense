@@ -405,7 +405,7 @@ def nettotals():
 
     return jsonify(resp)
 
-ALLOWABLE_RANGES = [30, 120, 240, 480, 1440, 2880, 5760, 10080]
+ALLOWABLE_RANGES = [30, 120, 240, 480, 1440, 2880, 5760, 10080, 20160, 40320]
 @app.route("/api/nettotals/range/<int:minutes>")
 def nettotals_range(minutes):
     if not (minutes in ALLOWABLE_RANGES):

@@ -112,6 +112,16 @@
                 v-on:click="setRange(10080)">
                 7d
             </span>
+            <span
+                :class="range === 20160 ? 'selected' : 'deselected'"
+                v-on:click="setRange(20160)">
+                14d
+            </span>
+            <span
+                :class="range === 40320 ? 'selected' : 'deselected'"
+                v-on:click="setRange(40320)">
+                28d
+            </span>
         </div>
 
         <div id="mempoolchart"></div>
@@ -277,7 +287,6 @@
                 v-on:click="setRange(2880)">
                 2d
             </span>
-            <!--
             <span
                 :class="range === 5760 ? 'selected' : 'deselected'"
                 v-on:click="setRange(5760)">
@@ -288,7 +297,16 @@
                 v-on:click="setRange(10080)">
                 7d
             </span>
-            -->
+            <span
+                :class="range === 20160 ? 'selected' : 'deselected'"
+                v-on:click="setRange(20160)">
+                14d
+            </span>
+            <span
+                :class="range === 40320 ? 'selected' : 'deselected'"
+                v-on:click="setRange(40320)">
+                28d
+            </span>
         </div>
 
         <div id="networkchart"></div>
