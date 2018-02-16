@@ -14,7 +14,7 @@ div.invisible { display: none; }
 div.section { width: 88%; margin: 0 auto; }
 div.section h2 { padding: 0.2vw 0; border-bottom: 2px dashed lightgray; }
 
-div#mempoolchart, div#networkchart { width: 90%; height: 500px; margin: 0 auto; }
+div#mempoolchart, div#networkchart, div#blocktemplatechart { width: 90%; height: 500px; margin: 0 auto; }
 
 div#donations img { width: 100px; }
 

@@ -3,4 +3,4 @@
 backend/node_modules
 package-lock.json
 frontend/chartist-plugin-tooltip
-mempoolbins.db
+*.db

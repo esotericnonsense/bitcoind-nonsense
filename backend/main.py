@@ -429,7 +429,30 @@ def nettotals_range(minutes):
 
     return jsonify({"list": l})
 
-@app.route("/api/ping")
+@app.route("/api/blocktemplate")
+def blocktemplate():
+    d = call_rpc("getblocktemplate")
+    if d["error"]:
+        return error_response("error from backend")
+
+    if not d["result"]:
+        return error_response("error from backend")
+
+    resp = {
+        "time": unix_time_seconds(datetime.datetime.utcnow())
+    }
+
+    l = []
+    for tx in d["result"]["transactions"]:
+        vsize = (tx["weight"] + 3) // 4
+        feerate = tx["fee"] / vsize
+        l.append((feerate, vsize, len(tx["depends"])))
+
+    resp["tx"] = l
+
+    return jsonify(resp)
+
+@app.route("/dev/api/ping")
 def ping():
     return jsonify({"pong": True})
 

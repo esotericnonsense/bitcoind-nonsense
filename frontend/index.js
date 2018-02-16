@@ -48,10 +48,12 @@ onload = function() {
             chaininfo: null,
             mempoolbins: null,
             nettotals: null,
+            blocktemplate: null,
+            bt_logscale: true,
             peers: null,
             data: 6,
             range: 0,
-            tab: "mempool-chart",
+            tab: "block-template",
             blocks: {},
         },
         filters: {
@@ -70,8 +72,10 @@ onload = function() {
                     return `${s}s`;
                 }
             },
-            formatBin: function(bin) {
-            }
+            blockIntervalBar: function(seconds) {
+                let minutes = Math.floor(seconds / 60);
+                return "*".repeat(minutes);
+            },
         },
         computed: {
             sortedBlocks: function() {
@@ -122,6 +126,10 @@ onload = function() {
             setTab: function(tab) {
                 app.tab = tab;
             },
+            rdBT: function() {
+                if (app.blocktemplate === undefined) { return; }
+                redrawBlockTemplate(app.blocktemplate);
+            },
         },
     })
 
@@ -140,6 +148,7 @@ onload = function() {
         }
         asyncRequest(`chaininfo`, processAsyncResponse);
         asyncRequest(`peerinfo`, processAsyncResponse);
+        asyncRequest(`blocktemplate`, processAsyncResponse);
     }, 5000);
 
     let bin_interval = 0;
@@ -178,6 +187,84 @@ onload = function() {
 
     let dealWithPeerinfo = function(peerinfo) {
         app.peers = peerinfo.peerinfo;
+    }
+
+    var BTCHART = null;
+
+    let dealWithBlockTemplate = function(blocktemplate) {
+        app.last_updated = app.now;
+        app.blocktemplate = blocktemplate;
+
+        redrawBlockTemplate(blocktemplate);
+    }
+
+    let redrawBlockTemplate = function(blocktemplate) {
+        let cum_vsize = 0;
+        let feerates = ["feerate"];
+        let cum_vsizes = ["cum_vsize"];
+        for (let tx of blocktemplate.tx) {
+            let feerate = tx[0];
+            let vsize = tx[1];
+
+            // let depends = tx[2];
+            if (app.bt_logscale) {
+                feerates.push(Math.log(feerate)/Math.log(2));
+            } else {
+                feerates.push(feerate);
+            }
+            cum_vsizes.push(cum_vsize);
+            cum_vsize += vsize;
+        }
+
+        let btcolumns = [
+            cum_vsizes,
+            feerates
+        ];
+
+        if (!BTCHART) {
+            BTCHART = c3.generate({
+                bindto: "#blocktemplatechart",
+                data: {
+                    x: "cum_vsize",
+                    columns: btcolumns,
+                    type: "area",
+                },
+                point: {
+                    show: false,
+                },
+                axis: {
+                    x: {
+                        tick: {
+                            values: [0, 200000, 400000, 600000, 800000, 1000000],
+                        }
+                    },
+                    y: {
+                        tick: {
+                            format: function (y) {
+                                if (app.bt_logscale) {
+                                    return Math.pow(2, y).toFixed(2);
+                                }
+                                return y.toFixed(2);
+                            },
+                        },
+                    },
+                },
+                tooltip: {
+                    format: {
+                        value: function(y, ratio, id) {
+                            if (app.bt_logscale) {
+                                return `${Math.pow(2, y).toFixed(2)} sat/b`;
+                            }
+                            return `${y.toFixed(2)} sat/b`;
+                        }
+                    }
+                }
+            });
+        } else {
+            BTCHART.load({
+                columns: btcolumns,
+            });
+        }
     }
 
     var CHART = null;
@@ -423,6 +510,8 @@ onload = function() {
             dealWithPeerinfo(response);
         } else if (request.startsWith("blockinfo")) {
             dealWithBlock(response);
+        } else if (request.startsWith("blocktemplate")) {
+            dealWithBlockTemplate(response);
         } else if (request.startsWith("mempool/bins/range")) {
             dealWithMempoolBinsRange(response);
         } else if (request.startsWith("mempool/bins")) {
@@ -438,6 +527,7 @@ onload = function() {
         app.connected = true;
         asyncRequest(`chaininfo`, processAsyncResponse);
         asyncRequest(`peerinfo`, processAsyncResponse);
+        asyncRequest(`blocktemplate`, processAsyncResponse);
         setBinInterval(INITIAL_RANGE); // implicit fetch of mempool/bins/range, nettotals/range
     }
 

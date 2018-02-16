@@ -25,6 +25,11 @@
 
         <div class="section" id="tab-chooser">
             <span
+                :class="tab === 'block-template' ? 'selected' : 'deselected'"
+                v-on:click="setTab('block-template')">
+                block template
+            </span>
+            <span
                 :class="tab === 'mempool-chart' ? 'selected' : 'deselected'"
                 v-on:click="setTab('mempool-chart')">
                 mempool chart
@@ -49,6 +54,26 @@
                 v-on:click="setTab('network-chart')">
                 network chart
             </span>
+        </div>
+
+        <div id="tab-block-template" class="tab"
+            :class="tab === 'block-template' ? 'visible' : 'invisible'"
+        >
+
+        <div class="section" v-if="blocktemplate">
+            <h2>
+                block template (next update in {{ Math.max(0, Math.floor(5 - (now - last_updated))) }}s)
+            </h2>
+            <p>
+                last block: {{ blocks[chaininfo.bestblockhash].height }} ({{ (now - blocks[chaininfo.bestblockhash].time) | timeInterval }} ago) [{{ now - blocks[chaininfo.bestblockhash].time | blockIntervalBar }}]
+            </p>
+
+            <input type="checkbox" id="checkbox" v-model="bt_logscale" @click="rdBT()" />
+            <label for="checkbox">{{ bt_logscale ? "log scale" : "linear scale" }}</label>
+        </div>
+
+        <div id="blocktemplatechart"></div>
+
         </div>
 
         <div id="tab-mempool-chart" class="tab"
